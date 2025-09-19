@@ -1,5 +1,21 @@
 from django.contrib import admin
-from .models import User
 
 # Register your models here.
-admin.site.register()
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
+from .forms import UserCreationForm, UserChangeForm
+from .models import User
+
+admin.site.register(User)
+
+class UserAdmin(UserAdmin):
+    add_form = UserCreationForm
+    form = UserChangeForm
+    model = User
+    list_display = [
+        "email",
+        "username",
+        "is_staff",
+        "is_active",
+    ]

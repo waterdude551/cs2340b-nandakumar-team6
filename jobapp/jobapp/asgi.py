@@ -1,5 +1,5 @@
 """
-ASGI config for jobapp project.
+ASGI config for jobapp2 project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
