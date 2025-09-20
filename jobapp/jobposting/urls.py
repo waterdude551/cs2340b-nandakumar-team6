@@ -1,8 +1,9 @@
 from django.urls import path
 from . import views
+
 urlpatterns = [
-    path('browsing/', views.signup, name='jobposting.browsing'),
-    path('addpost/', views.login, name='jobposting.addpost'),
-    #path('/', views.logout, name='jobposting.url3'),
+    path('', views.browsing, name='jobposting.browsing'), #default is job post browsing
+    path('addpost/', views.addpost, name='jobposting.addpost'), #goes to addpost page
+    path('<int:id>/', views.browsepost, name='jobposting.browsepost'), #goes to specific post
 
 ]
