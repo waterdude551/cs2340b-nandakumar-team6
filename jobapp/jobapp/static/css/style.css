@@ -11,5 +11,8 @@ h1 {
 }
 
 h2 {
-
+    color:aliceblue;
+    text-align: left;
+    font-family: "Trebuchet MS", sans-serif;
+    font-size: small;
 }
