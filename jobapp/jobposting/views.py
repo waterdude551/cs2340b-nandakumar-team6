@@ -3,18 +3,18 @@ from .models import JobPost
 from django.contrib.auth.decorators import login_required
 """
 GOALS:
-    - should have a model called job post (done)
+    - should have a model called job post (DONE)
         - has id
         - has title
         - has job description
         - has qualifications
     - should have a url that displays all job postings
-        - should show a list of all job posts
-        - should be searchable
+        - should pass a list of all job posts (DONE)
+        - should be searchable (DONE)
             - by title?
             - by job description?
             - by qualifications?
-    - should be able to go to an individual job (by id)
+    - should be able to go to an individual job by id
         - if seeker: should be able to apply?
         - if recruiter: can edit?
     - should have a url that redirects to add job post page
@@ -38,13 +38,13 @@ def browsing(request):
     return render(request, 'jobposting/browsing.html') #TODO
 
 #shows one job post in detail
-def browsepost(request, id):
+def viewpost(request, id):
     jobpost = JobPost.objects.get(id=id)
     #get job details here
     return render(request, 'jobposting/browsepost.html') #TODO
 
 #should have an @is recruiter or smth
 @login_required
-def addpost(request, id):
+def addpost(request):
     #if request is valid
     return render(request, 'jobposting/addpost.html') #TODO
