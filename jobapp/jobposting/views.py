@@ -1,12 +1,27 @@
 from django.shortcuts import render
-
+from .models import JobPost
+from django.contrib.auth.decorators import login_required
 """
 GOALS:
-    - should have a model called job post
+    - should have a model called job post (done)
+        - has id
+        - has title
+        - has job description
+        - has qualifications
     - should have a url that displays all job postings
-    - should be able to go to an individual job
-    - should have a url that displays stuff for adding a job
-    - should be similar to reviews / review posting
+        - should show a list of all job posts
+        - should be searchable
+            - by title?
+            - by job description?
+            - by qualifications?
+    - should be able to go to an individual job (by id)
+        - if seeker: should be able to apply?
+        - if recruiter: can edit?
+    - should have a url that redirects to add job post page
+        - should only appear for recruiters
+        - should have a form where recruiters fill out title, desc, qualifications
+
+    note: should be similar to reviews / review posting!!
 """
 
 # Create your views here.
@@ -14,13 +29,22 @@ GOALS:
 def browsing(request):
     #need to get all job postings
     #then display them
+    search_term = request.GET.get('search')
+    if search_term:
+        allPosts = JobPost.objects.filter(title__icontains=search_term)
+    else:
+        allPosts = JobPost.objects.all()
+    template_data = {}
     return render(request, 'jobposting/browsing.html') #TODO
 
 #shows one job post in detail
 def browsepost(request, id):
+    jobpost = JobPost.objects.get(id=id)
     #get job details here
     return render(request, 'jobposting/browsepost.html') #TODO
 
 #should have an @is recruiter or smth
-def addpost(request):
+@login_required
+def addpost(request, id):
+    #if request is valid
     return render(request, 'jobposting/addpost.html') #TODO
