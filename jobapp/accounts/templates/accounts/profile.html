@@ -1,0 +1,56 @@
+{% load accounts_tags %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        {% if profile.get_full_name %}
+            {{ profile.get_full_name }} | JobApp
+        {% else %}
+            {{ profile.username }} | JobApp
+        {% endif %}
+    </title>
+</head>
+<body>
+    <h1>{{ profile.username }}'s Profile</h1>
+    <ul>
+        {% if profile.role %}
+            <li><strong>Role:</strong> {{ profile.role }}</li>
+        {% endif %}
+        {% if profile.get_full_name %}
+            <li><strong>Name:</strong> {{ profile.get_full_name }}</li>
+        {% endif %}
+        {% if profile.email %}
+            <li><strong>Email:</strong> {{ profile.email }}</li>
+        {% endif %}
+        {% if profile.role == "seeker" and seeker_profile %}
+            {% if seeker_profile.headline %}<li><strong>Headline:</strong> {{ seeker_profile.headline }}</li>{% endif %}
+            {% if seeker_profile.skills %}<li><strong>Skills:</strong> {{ seeker_profile.skills }}</li>{% endif %}
+            {% if seeker_profile.education %}<li><strong>Education:</strong> {{ seeker_profile.education }}</li>{% endif %}
+            {% if seeker_profile.work_experience %}<li><strong>Work Experience:</strong> {{ seeker_profile.work_experience }}</li>{% endif %}
+            {% if seeker_profile.links %}
+                <li><strong>Links:</strong>
+                    <ul>
+                    {% for link in seeker_profile.links|split:"," %}
+                        {% with link=link|trim %}
+                            {% if link %}
+                                {% if link|slice:":7" == "http://" or link|slice:":8" == "https://" %}
+                                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                                {% else %}
+                                    <li><a href="https://{{ link }}" target="_blank">{{ link }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endif %}
+        <!-- Add recruiter-specific fields here if needed -->
+    </ul>
+
+    {% if user.is_authenticated and user.id == profile.id %}
+        <a href="{% url 'accounts.edit_profile' profile.id %}">Edit Profile</a>
+    {% endif %}
+</body>
+</html>
