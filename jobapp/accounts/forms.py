@@ -41,6 +41,11 @@ class CustomUserCreationForm(UserCreationForm):
 
             )
 
+        # Hide 'admin' from role choices if role field exists
+        if 'role' in self.fields:
+            choices = self.fields['role'].choices
+            self.fields['role'].choices = [c for c in choices if c[0] != 'admin']
+
 class UserChangeForm(UserChangeForm):
 
     class Meta:
