@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'accounts',
     'jobapp',
     'jobposting',
-    'search'
+    'search',
+    'home',
 ]
 
 MIDDLEWARE = [

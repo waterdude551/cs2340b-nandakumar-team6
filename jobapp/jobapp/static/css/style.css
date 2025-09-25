@@ -10,6 +10,13 @@ h1 {
     font-size: medium;
 }
 
-h2 {
 
+footer {
+    color:aliceblue !important;
+    font-family: "Trebuchet MS", sans-serif;
+    font-size: medium;
+}
+
+li {
+    color:aliceblue !important;
 }

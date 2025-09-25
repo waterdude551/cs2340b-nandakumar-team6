@@ -1,50 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Profile | JobApp</title>
-</head>
-<body>
-    <h1>Edit Your Profile</h1>
-    <form method="post">
-        {% csrf_token %}
-        <ul>
+{% extends "base.html" %}
+{% block title %}Edit Profile | JobBoard{% endblock %}
+{% block content %}
+<h1>Edit Your Profile</h1>
+<form method="post">
+    {% csrf_token %}
+    <ul>
+        <li>
+            <label for="id_first_name">First name:</label>
+            <input type="text" name="first_name" id="id_first_name" value="{{ initial.first_name }}">
+        </li>
+        <li>
+            <label for="id_last_name">Last name:</label>
+            <input type="text" name="last_name" id="id_last_name" value="{{ initial.last_name }}">
+        </li>
+        <li>
+            <label for="id_email">Email:</label>
+            <input type="email" name="email" id="id_email" value="{{ initial.email }}">
+        </li>
+        {% if user.role == "seeker" %}
             <li>
-                <label for="id_first_name">First name:</label>
-                <input type="text" name="first_name" id="id_first_name" value="{{ initial.first_name }}">
+                <label for="id_headline">Headline:</label>
+                <input type="text" name="headline" id="id_headline" value="{{ initial.headline }}">
             </li>
             <li>
-                <label for="id_last_name">Last name:</label>
-                <input type="text" name="last_name" id="id_last_name" value="{{ initial.last_name }}">
+                <label for="id_skills">Skills:</label>
+                <input type="text" name="skills" id="id_skills" value="{{ initial.skills }}">
             </li>
             <li>
-                <label for="id_email">Email:</label>
-                <input type="email" name="email" id="id_email" value="{{ initial.email }}">
+                <label for="id_education">Education:</label>
+                <input type="text" name="education" id="id_education" value="{{ initial.education }}">
             </li>
-            {% if user.role == "seeker" %}
-                <li>
-                    <label for="id_headline">Headline:</label>
-                    <input type="text" name="headline" id="id_headline" value="{{ initial.headline }}">
-                </li>
-                <li>
-                    <label for="id_skills">Skills:</label>
-                    <input type="text" name="skills" id="id_skills" value="{{ initial.skills }}">
-                </li>
-                <li>
-                    <label for="id_education">Education:</label>
-                    <input type="text" name="education" id="id_education" value="{{ initial.education }}">
-                </li>
-                <li>
-                    <label for="id_work_experience">Work Experience:</label>
-                    <input type="text" name="work_experience" id="id_work_experience" value="{{ initial.work_experience }}">
-                </li>
-                <li>
-                    <label for="id_links">Links:</label>
-                    <input type="text" name="links" id="id_links" value="{{ initial.links }}">
-                </li>
-            {% endif %}
-        </ul>
-        <button type="submit">Save Changes</button>
-    </form>
-    <a href="{% url 'accounts.profile' user.id %}">Back to Profile</a>
-</body>
-</html>
+            <li>
+                <label for="id_work_experience">Work Experience:</label>
+                <input type="text" name="work_experience" id="id_work_experience" value="{{ initial.work_experience }}">
+            </li>
+            <li>
+                <label for="id_links">Links:</label>
+                <input type="text" name="links" id="id_links" value="{{ initial.links }}">
+            </li>
+        {% endif %}
+    </ul>
+    <button type="submit">Save Changes</button>
+</form>
+<a href="{% url 'accounts.profile' user.id %}">Back to Profile</a>
+{% endblock %}

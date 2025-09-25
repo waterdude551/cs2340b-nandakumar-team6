@@ -1,7 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
 {% load accounts_tags %}
-
 <!DOCTYPE html>
-<html>
 <head>
     <title>
         {% if profile.get_full_name %}
@@ -53,4 +53,4 @@
         <a href="{% url 'accounts.edit_profile' profile.id %}">Edit Profile</a>
     {% endif %}
 </body>
-</html>
+{% endblock %}
