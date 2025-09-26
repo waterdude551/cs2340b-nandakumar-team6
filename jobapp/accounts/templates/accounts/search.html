@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Search Users | JobBoard{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Search Users</h1>
+    <form method="get" action="{% url 'accounts.search' %}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search by username" value="{{ query }}">
+            <input type="text" name="skills" class="form-control" placeholder="Search by skills" value="{{ skills }}">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+    {% if users %}
+        <ul class="list-group">
+            {% for user in users %}
+                <li class="list-group-item">
+                    <a href="{% url 'accounts.profile' user.id %}">{{ user.username }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+</div>
+{% endblock %}
