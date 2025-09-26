@@ -10,7 +10,7 @@ from .models import User, SeekerProfile
 @login_required
 def logout(request):
     auth_logout(request)
-    return redirect('home.index')
+    return redirect('home')
 
 
 def login(request):
@@ -28,7 +28,7 @@ def login(request):
             return render(request, 'accounts/login.html', {'template_data': template_data})
         else:
             auth_login(request, user)
-            return redirect(''
+            return redirect('home')
 
 
 def signup(request):
