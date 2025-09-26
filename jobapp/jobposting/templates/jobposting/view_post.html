@@ -9,13 +9,13 @@
 
 <div class="container mt-4">
     <h1>{{ jobpost.title }}</h1>
-    <p><strong>Location:</strong> {{ jobpost.location }}</p>
-    <p><strong>Skills:</strong> {{ jobpost.skills }}</p>
-    <p><strong>Salary:</strong> {{ jobpost.salary }}</p>
-    <p><strong>Remote/On-site:</strong> {{ jobpost.get_remote_type_display }}</p>
-    <p><strong>Visa Sponsorship:</strong> {{ jobpost.visa_sponsorship|yesno:"Yes,No" }}</p>
-    <p><strong>Description:</strong> {{ jobpost.description }}</p>
-    <p><strong>Qualifications:</strong> {{ jobpost.qualifications }}</p>
+    <p class="text-light"><strong>Location:</strong> {{ jobpost.location }}</p>
+    <p class="text-light"><strong>Skills:</strong> {{ jobpost.skills }}</p>
+    <p class="text-light"><strong>Salary:</strong> {{ jobpost.salary }}</p>
+    <p class="text-light"><strong>Remote/On-site:</strong> {{ jobpost.get_remote_type_display }}</p>
+    <p class="text-light"><strong>Visa Sponsorship:</strong> {{ jobpost.visa_sponsorship|yesno:"Yes,No" }}</p>
+    <p class="text-light"><strong>Description:</strong> {{ jobpost.description }}</p>
+    <p class="text-light"><strong>Qualifications:</strong> {{ jobpost.qualifications }}</p>
 
     {% if can_edit %}
         <a href="{% url 'jobposting.edit_post' jobpost.id %}" class="btn btn-warning">Edit Post</a>

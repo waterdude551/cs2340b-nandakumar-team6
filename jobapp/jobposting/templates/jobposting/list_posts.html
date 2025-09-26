@@ -43,19 +43,19 @@
     </section>
 
 <div class="container mt-4">
-    <h2>Job Listings</h2>
+    <h2 class="text-light">Job Listings</h2>
     {% if jobposts %}
         <ul class="list-group">
         {% for job in jobposts %}
             <li class="list-group-item job-dark mb-3">
-                <h4>{{ job.title }}</h4>
-                <p><strong>Location:</strong> {{ job.location }}</p>
-                <p><strong>Skills:</strong> {{ job.skills }}</p>
-                <p><strong>Salary:</strong> {{ job.salary }}</p>
-                <p><strong>Remote/On-site:</strong> {{ job.get_remote_type_display }}</p>
-                <p><strong>Visa Sponsorship:</strong> {{ job.visa_sponsorship|yesno:"Yes,No" }}</p>
-                <p><strong>Description:</strong> {{ job.description }}</p>
-                <p><strong>Qualifications:</strong> {{ job.qualifications }}</p>
+                <h4 class="text-dark">{{ job.title }}</h4>
+                <p class="text-dark"><strong>Location:</strong> {{ job.location }}</p>
+                <p class="text-dark"><strong>Skills:</strong> {{ job.skills }}</p>
+                <p class="text-dark"><strong>Salary:</strong> {{ job.salary }}</p>
+                <p class="text-dark"><strong>Remote/On-site:</strong> {{ job.get_remote_type_display }}</p>
+                <p class="text-dark"><strong>Visa Sponsorship:</strong> {{ job.visa_sponsorship|yesno:"Yes,No" }}</p>
+                <p class="text-dark"><strong>Description:</strong> {{ job.description }}</p>
+                <p class="text-dark"><strong>Qualifications:</strong> {{ job.qualifications }}</p>
                 <a href="{% url 'jobposting.viewpost' job.id %}" class="btn btn-info mt-2">View Post</a>
             </li>
         {% endfor %}
