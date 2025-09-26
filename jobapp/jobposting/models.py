@@ -25,3 +25,18 @@ class JobPost(models.Model):
     visa_sponsorship = models.BooleanField(default=False)
     description = models.CharField(max_length=1000)
     qualifications = models.CharField(max_length=1000)
+
+class JobApplication(models.Model):
+    id = models.AutoField(primary_key=True)
+    STAGE_CHOICES = [
+        ('applied', 'Applied'),
+        ('under_review', 'Under Review'),
+        ('interview', 'Interview'),
+        ('offer', 'Offered'),
+        ('closed', 'Closed'),
+    ]
+    stage = models.CharField(max_length=50, default='applied', choices=STAGE_CHOICES)
+    job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name='applications')
+    seeker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
+    note = models.TextField(max_length=255)
+    applied_at = models.DateTimeField(auto_now_add=True)

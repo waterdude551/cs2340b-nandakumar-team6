@@ -28,7 +28,13 @@
             <h1 class="main-title">JobBoard</h1>
             <p class="mission">Your next job starts here</p>
             <div class="cta">
-                <a href="#" class="btn btn-primary btn-lg">Get Started →</a>
+                {% if user.role == 'seeker' %}
+                    <a href="{% url 'jobposting.browsing' %}" class="btn btn-primary btn-lg">Get Started →</a>
+                {% elif user.role == 'recruiter' %}
+                    <a href="{% url 'jobposting.addpost' %}" class="btn btn-primary btn-lg">Post a Job →</a>
+                {% else %}
+                    <a href="{% url 'accounts.signup' %}" class="btn btn-primary btn-lg">Sign Up to Get Started →</a>
+                {% endif %}
             </div>
         </div>
     </main>

@@ -2,7 +2,7 @@ from django.http import HttpResponseForbidden, Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from .models import JobPost
+from .models import JobPost, JobApplication
 """
 GOALS:
     - should have a model called job post (DONE)
@@ -58,7 +58,10 @@ def browsing(request):
 def viewpost(request, id):
     jobpost = JobPost.objects.get(id=id)
     can_edit = request.user.is_authenticated and jobpost.recruiter == request.user
-    return render(request, 'jobposting/view_post.html', {'jobpost': jobpost, 'can_edit': can_edit})
+    form = None
+    if request.user.is_authenticated and getattr(request.user, "role", None) == "seeker":
+        form = JobApplicationForm()
+    return render(request, 'jobposting/view_post.html', {'jobpost': jobpost, 'can_edit': can_edit, 'form': form})
 
 #should have an @is recruiter or smth
 from .forms import JobPostForm
@@ -89,3 +92,68 @@ def edit_post(request, id):
     else:
         form = JobPostForm(instance=jobpost)
     return render(request, 'jobposting/edit_post.html', {'form': form, 'jobpost': jobpost})
+
+from .forms import JobApplicationForm
+def apply(request, id):
+    jobpost = JobPost.objects.get(id=id)
+    if request.method == 'POST':
+        form = JobApplicationForm(request.POST)
+        if form.is_valid():
+            application = form.save(commit=False)
+            application.job_post = jobpost
+            application.seeker = request.user
+            application.save()
+            return redirect('jobposting.viewpost', id=jobpost.id)
+    else:
+        form = JobApplicationForm()
+    return render(request, 'jobposting/apply.html', {'form': form, 'jobpost': jobpost})
+@login_required
+def list_applications(request, jobpost_id):
+    jobpost = JobPost.objects.get(id=jobpost_id)
+    sort = request.GET.get('sort', 'date')
+    direction = request.GET.get('dir', 'desc')
+    hide_closed = request.GET.get('hide_closed', '0') == '1'
+    applications = jobpost.applications.select_related('seeker').all()
+    if hide_closed:
+        applications = applications.exclude(stage='closed')
+
+    # Custom stage order for sorting
+    stage_order = ['applied', 'under_review', 'interview', 'offer', 'closed']
+    if sort == 'stage':
+        # Annotate with custom order
+        def stage_key(app):
+            try:
+                return stage_order.index(app.stage)
+            except ValueError:
+                return len(stage_order)
+        applications = sorted(applications, key=stage_key, reverse=(direction=='desc'))
+    else:
+        if sort == 'applicant':
+            order = 'seeker__username'
+        else:
+            order = 'applied_at'
+        if direction == 'desc':
+            order = '-' + order
+        applications = applications.order_by(order)
+
+    return render(request, 'jobposting/list_applications.html', {
+        'applications': applications,
+        'jobpost': jobpost,
+        'sort': sort,
+        'dir': direction,
+        'hide_closed': hide_closed
+    })
+
+@login_required
+def update_application_stage(request, application_id, jobpost_id):
+    application = JobApplication.objects.get(id=application_id)
+    jobpost = JobPost.objects.get(id=jobpost_id)
+    # Only allow recruiter of the job post to update
+    if jobpost.recruiter != request.user:
+        return HttpResponseForbidden("You are not allowed to update this application.")
+    if request.method == 'POST':
+        new_stage = request.POST.get('stage')
+        if new_stage in dict(JobApplication.STAGE_CHOICES):
+            application.stage = new_stage
+            application.save()
+    return redirect('jobposting.list_applications', jobpost_id=jobpost.id)

@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Applications for: {{ jobpost.title }}</h2>
+<form method="get" class="mb-2">
+  <input type="hidden" name="sort" value="{{ sort }}">
+  <input type="hidden" name="dir" value="{{ dir }}">
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="1" id="hideClosedCheck" name="hide_closed" {% if hide_closed %}checked{% endif %} onchange="this.form.submit()">
+    <label class="form-check-label" for="hideClosedCheck">
+      Hide closed applications
+    </label>
+  </div>
+</form>
+<table class="table table-striped">
+    <thead>
+    <tr>
+      <th>
+        <a href="?sort=applicant&dir={% if sort == 'applicant' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if hide_closed %}&hide_closed=1{% endif %}">
+          Applicant
+          {% if sort == 'applicant' %}
+            {% if dir == 'asc' %}&#9650;{% else %}&#9660;{% endif %}
+          {% endif %}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=stage&dir={% if sort == 'stage' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if hide_closed %}&hide_closed=1{% endif %}">
+          Stage
+          {% if sort == 'stage' %}
+            {% if dir == 'asc' %}&#9650;{% else %}&#9660;{% endif %}
+          {% endif %}
+        </a>
+      </th>
+      <th>
+        <a href="?sort=date&dir={% if sort == 'date' and dir == 'asc' %}desc{% else %}asc{% endif %}{% if hide_closed %}&hide_closed=1{% endif %}">
+          Applied At
+          {% if sort == 'date' %}
+            {% if dir == 'asc' %}&#9650;{% else %}&#9660;{% endif %}
+          {% endif %}
+        </a>
+      </th>
+      <th>Note</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for application in applications %}
+        <tr>
+            <td>{{ application.seeker.username }}</td>
+            <td>{{ application.get_stage_display }}</td>
+            <td>{{ application.applied_at|date:'Y-m-d H:i' }}</td>
+            <td>
+                {% if application.note %}
+                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#noteModal{{ application.id }}">
+                    See Note
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="noteModal{{ application.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ application.id }}" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="noteModalLabel{{ application.id }}">Application Note</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        {{ application.note|linebreaksbr }}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% else %}
+                <span class="text-muted">None</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if application.stage == 'applied' %}
+                    <!-- Mark as Reviewing -->
+                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal-reviewing-{{ application.id }}">Mark as Reviewing</button>
+                    <div class="modal fade" id="confirmModal-reviewing-{{ application.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-reviewing-{{ application.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel-reviewing-{{ application.id }}">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">Are you sure you want to mark this application as <b>Reviewing</b>?</div>
+                          <div class="modal-footer">
+                            <form method="post" action="{% url 'jobposting.update_application_stage' application.id jobpost.id %}">
+                              {% csrf_token %}
+                              <button type="submit" name="stage" value="under_review" class="btn btn-warning btn-sm">Yes, Mark as Reviewing</button>
+                            </form>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Close -->
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal-close-{{ application.id }}">Close</button>
+                    <div class="modal fade" id="confirmModal-close-{{ application.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-close-{{ application.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel-close-{{ application.id }}">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">Are you sure you want to <b>Close</b> this application?</div>
+                          <div class="modal-footer">
+                            <form method="post" action="{% url 'jobposting.update_application_stage' application.id jobpost.id %}">
+                              {% csrf_token %}
+                              <button type="submit" name="stage" value="closed" class="btn btn-danger btn-sm">Yes, Close</button>
+                            </form>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                {% elif application.stage == 'under_review' %}
+                    <!-- Mark for Interview -->
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal-interview-{{ application.id }}">Mark for Interview</button>
+                    <div class="modal fade" id="confirmModal-interview-{{ application.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-interview-{{ application.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel-interview-{{ application.id }}">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">Are you sure you want to mark this application for <b>Interview</b>?</div>
+                          <div class="modal-footer">
+                            <form method="post" action="{% url 'jobposting.update_application_stage' application.id jobpost.id %}">
+                              {% csrf_token %}
+                              <button type="submit" name="stage" value="interview" class="btn btn-primary btn-sm">Yes, Mark for Interview</button>
+                            </form>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Close -->
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal-close-{{ application.id }}">Close</button>
+                    <div class="modal fade" id="confirmModal-close-{{ application.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-close-{{ application.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel-close-{{ application.id }}">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">Are you sure you want to <b>Close</b> this application?</div>
+                          <div class="modal-footer">
+                            <form method="post" action="{% url 'jobposting.update_application_stage' application.id jobpost.id %}">
+                              {% csrf_token %}
+                              <button type="submit" name="stage" value="closed" class="btn btn-danger btn-sm">Yes, Close</button>
+                            </form>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                {% elif application.stage == 'interview' %}
+                    <!-- Offer -->
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal-offer-{{ application.id }}">Offer</button>
+                    <div class="modal fade" id="confirmModal-offer-{{ application.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-offer-{{ application.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel-offer-{{ application.id }}">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">Are you sure you want to <b>Offer</b> this application?</div>
+                          <div class="modal-footer">
+                            <form method="post" action="{% url 'jobposting.update_application_stage' application.id jobpost.id %}">
+                              {% csrf_token %}
+                              <button type="submit" name="stage" value="offer" class="btn btn-success btn-sm">Yes, Offer</button>
+                            </form>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Close -->
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal-close-{{ application.id }}">Close</button>
+                    <div class="modal fade" id="confirmModal-close-{{ application.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-close-{{ application.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel-close-{{ application.id }}">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">Are you sure you want to <b>Close</b> this application?</div>
+                          <div class="modal-footer">
+                            <form method="post" action="{% url 'jobposting.update_application_stage' application.id jobpost.id %}">
+                              {% csrf_token %}
+                              <button type="submit" name="stage" value="closed" class="btn btn-danger btn-sm">Yes, Close</button>
+                            </form>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                {% elif application.stage == 'offer' %}
+                    <!-- Close -->
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal-close-{{ application.id }}">Close</button>
+                    <div class="modal fade" id="confirmModal-close-{{ application.id }}" tabindex="-1" aria-labelledby="confirmModalLabel-close-{{ application.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="confirmModalLabel-close-{{ application.id }}">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">Are you sure you want to <b>Close</b> this application?</div>
+                          <div class="modal-footer">
+                            <form method="post" action="{% url 'jobposting.update_application_stage' application.id jobpost.id %}">
+                              {% csrf_token %}
+                              <button type="submit" name="stage" value="closed" class="btn btn-danger btn-sm">Yes, Close</button>
+                            </form>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center">No applications found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
