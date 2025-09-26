@@ -39,6 +39,7 @@ def browsing(request):
 
 #shows one job post in detail
 def viewpost(request, id):
+    search_term = request.GET.get('search')
     jobpost = JobPost.objects.get(id=id)
     #get job details here
     return render(request, 'jobposting/browsepost.html') #TODO

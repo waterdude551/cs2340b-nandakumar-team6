@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'accounts',
     'jobapp',
     'jobposting',
-    'search',
     'home',
 ]
 
