@@ -1,6 +1,8 @@
-from django.shortcuts import render
-from .models import JobPost
+from django.http import HttpResponseForbidden, Http404
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from .models import JobPost
 """
 GOALS:
     - should have a model called job post (DONE)
@@ -27,24 +29,63 @@ GOALS:
 # Create your views here.
 #shows all job postings
 def browsing(request):
-    #need to get all job postings
-    #then display them
-    search_term = request.GET.get('search')
-    if search_term:
-        allPosts = JobPost.objects.filter(title__icontains=search_term)
-    else:
-        allPosts = JobPost.objects.all()
-    template_data = {}
-    return render(request, 'jobposting/browsing.html') #TODO
+    jobposts = JobPost.objects.all()
+    title = request.GET.get('title', '')
+    skills = request.GET.get('skills', '')
+    location = request.GET.get('location', '')
+    salary = request.GET.get('salary', '')
+    remote_type = request.GET.get('remote_type', '')
+    visa_sponsorship = request.GET.get('visa_sponsorship', '')
+
+    if title:
+        jobposts = jobposts.filter(title__icontains=title)
+    if skills:
+        jobposts = jobposts.filter(skills__icontains=skills)
+    if location:
+        jobposts = jobposts.filter(location__icontains=location)
+    if salary:
+        jobposts = jobposts.filter(salary__icontains=salary)
+    if remote_type:
+        jobposts = jobposts.filter(remote_type=remote_type)
+    if visa_sponsorship == 'true':
+        jobposts = jobposts.filter(visa_sponsorship=True)
+    elif visa_sponsorship == 'false':
+        jobposts = jobposts.filter(visa_sponsorship=False)
+
+    return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
 
 #shows one job post in detail
 def viewpost(request, id):
     jobpost = JobPost.objects.get(id=id)
-    #get job details here
-    return render(request, 'jobposting/browsepost.html') #TODO
+    can_edit = request.user.is_authenticated and jobpost.recruiter == request.user
+    return render(request, 'jobposting/view_post.html', {'jobpost': jobpost, 'can_edit': can_edit})
 
 #should have an @is recruiter or smth
+from .forms import JobPostForm
+
 @login_required
 def addpost(request):
-    #if request is valid
-    return render(request, 'jobposting/addpost.html') #TODO
+    if request.method == 'POST':
+        form = JobPostForm(request.POST)
+        if form.is_valid():
+            jobpost = form.save(commit=False)
+            jobpost.recruiter = request.user
+            jobpost.save()
+            return render(request, 'jobposting/add_post.html', {'form': JobPostForm(), 'success': True})
+    else:
+        form = JobPostForm()
+    return render(request, 'jobposting/add_post.html', {'form': form})
+
+@login_required
+def edit_post(request, id):
+    jobpost = JobPost.objects.get(id=id)
+    if jobpost.recruiter != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this post.")
+    if request.method == 'POST':
+        form = JobPostForm(request.POST, instance=jobpost)
+        if form.is_valid():
+            form.save()
+            return redirect('jobposting.viewpost', id=jobpost.id)
+    else:
+        form = JobPostForm(instance=jobpost)
+    return render(request, 'jobposting/edit_post.html', {'form': form, 'jobpost': jobpost})

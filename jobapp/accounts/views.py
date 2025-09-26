@@ -10,7 +10,7 @@ from .models import User, SeekerProfile
 @login_required
 def logout(request):
     auth_logout(request)
-    return redirect('home.index')
+    return redirect('home')
 
 
 def login(request):

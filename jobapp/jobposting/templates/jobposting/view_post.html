@@ -1,0 +1,24 @@
+<!-- FORMERLY browsepost.html -->
+{% extends "base.html" %}
+{% block title %}Browse Posts | JobBoard{% endblock %}
+{% block content %}
+<head>
+    <title>List Job Posting</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<div class="container mt-4">
+    <h1>{{ jobpost.title }}</h1>
+    <p><strong>Location:</strong> {{ jobpost.location }}</p>
+    <p><strong>Skills:</strong> {{ jobpost.skills }}</p>
+    <p><strong>Salary:</strong> {{ jobpost.salary }}</p>
+    <p><strong>Remote/On-site:</strong> {{ jobpost.get_remote_type_display }}</p>
+    <p><strong>Visa Sponsorship:</strong> {{ jobpost.visa_sponsorship|yesno:"Yes,No" }}</p>
+    <p><strong>Description:</strong> {{ jobpost.description }}</p>
+    <p><strong>Qualifications:</strong> {{ jobpost.qualifications }}</p>
+
+    {% if can_edit %}
+        <a href="{% url 'jobposting.edit_post' jobpost.id %}" class="btn btn-warning">Edit Post</a>
+    {% endif %}
+</div>
+{% endblock %}

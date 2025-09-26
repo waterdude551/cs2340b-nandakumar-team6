@@ -1,0 +1,71 @@
+<!-- FORMERLY browsing.html -->
+{% extends "base.html" %}
+{% block title %}JobBoard Find Jobs{% endblock %}
+{% block content %}
+<head>
+    <title>List Job Posting</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<section class="search-section">
+        <div class="container">
+            <div class="search-wrap"> <!-- keeps bar compact -->
+            <form class="row g-2 justify-content-center align-items-center" method="get">
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <input type="text" name="title" class="form-control" placeholder="Job Title" value="{{ request.GET.title }}">
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <input type="text" name="skills" class="form-control" placeholder="Skills" value="{{ request.GET.skills }}">
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <input type="text" name="location" class="form-control" placeholder="Location" value="{{ request.GET.location }}">
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <input type="text" name="salary" class="form-control" placeholder="Salary" value="{{ request.GET.salary }}">
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <select name="remote_type" class="form-control">
+                        <option value="">Remote/On-site</option>
+                        <option value="remote" {% if request.GET.remote_type == 'remote' %}selected{% endif %}>Remote</option>
+                        <option value="on-site" {% if request.GET.remote_type == 'on-site' %}selected{% endif %}>On-site</option>
+                        <option value="hybrid" {% if request.GET.remote_type == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3 mb-2 mb-md-0">
+                    <select name="visa_sponsorship" class="form-control">
+                        <option value="">Visa Sponsorship</option>
+                        <option value="true" {% if request.GET.visa_sponsorship == 'true' %}selected{% endif %}>Yes</option>
+                        <option value="false" {% if request.GET.visa_sponsorship == 'false' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-auto">
+                    <button class="btn btn-primary w-100 w-md-auto" type="submit">Search</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </section>
+
+<div class="container mt-4">
+    <h2>Job Listings</h2>
+    {% if jobposts %}
+        <ul class="list-group">
+        {% for job in jobposts %}
+            <li class="list-group-item job-dark mb-3">
+                <h4>{{ job.title }}</h4>
+                <p><strong>Location:</strong> {{ job.location }}</p>
+                <p><strong>Skills:</strong> {{ job.skills }}</p>
+                <p><strong>Salary:</strong> {{ job.salary }}</p>
+                <p><strong>Remote/On-site:</strong> {{ job.get_remote_type_display }}</p>
+                <p><strong>Visa Sponsorship:</strong> {{ job.visa_sponsorship|yesno:"Yes,No" }}</p>
+                <p><strong>Description:</strong> {{ job.description }}</p>
+                <p><strong>Qualifications:</strong> {{ job.qualifications }}</p>
+                <a href="{% url 'jobposting.viewpost' job.id %}" class="btn btn-info mt-2">View Post</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No job posts found.</p>
+    {% endif %}
+</div>
+{% endblock %}
