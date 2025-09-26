@@ -97,3 +97,18 @@ def edit_profile(request, id):
             'links': seeker_profile.links,
         })
     return render(request, 'accounts/edit_profile.html', {'user': user, 'initial': initial})
+
+@login_required
+def search_users(request):
+    query = request.GET.get('q', '')
+    user_type = request.GET.get('user_type', 'seeker')
+    skills = request.GET.get('skills', '')
+    #search by username or skills
+    users = User.objects.filter(role=user_type)
+    if query:
+        users = users.filter(username__icontains=query)
+    elif skills and user_type == 'seeker':
+        users = users.filter(seeker_profile__skills__icontains=skills)
+    else:
+        users = []
+    return render(request, 'accounts/search.html', {'users': users, 'query': query, 'skills': skills})
