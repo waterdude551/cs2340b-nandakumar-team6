@@ -1,5 +1,5 @@
 from django import forms
-from .models import JobPost
+from .models import JobPost, JobApplication
 
 # Form for creating a job post based on add_post.html fields
 class JobPostForm(forms.ModelForm):
@@ -18,3 +18,11 @@ class JobPostForm(forms.ModelForm):
 			'description': forms.Textarea(attrs={'placeholder': 'Enter job description here', 'class': 'form-control', 'rows': 4}),
 			'qualifications': forms.Textarea(attrs={'placeholder': 'Enter mandatory qualifications here', 'class': 'form-control', 'rows': 3}),
 		}
+
+class JobApplicationForm(forms.ModelForm):
+    class Meta:
+        model = JobApplication
+        fields = ['note']
+        widgets = {
+            'note': forms.Textarea(attrs={'placeholder': 'Enter a note for your application (optional)', 'class': 'form-control', 'rows': 3}),
+        }

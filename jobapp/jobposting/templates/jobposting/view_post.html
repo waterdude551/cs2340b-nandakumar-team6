@@ -1,10 +1,10 @@
+
 <!-- FORMERLY browsepost.html -->
 {% extends "base.html" %}
 {% block title %}Browse Posts | JobBoard{% endblock %}
 {% block content %}
 <head>
     <title>List Job Posting</title>
-    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <div class="container mt-4">
@@ -19,6 +19,36 @@
 
     {% if can_edit %}
         <a href="{% url 'jobposting.edit_post' jobpost.id %}" class="btn btn-warning">Edit Post</a>
+        <a href="{% url 'jobposting.list_applications' jobpost.id %}" class="btn btn-info">View Applications</a>
+    {% endif %}
+    {% if user.is_authenticated and user.role == "seeker" %}
+        <!-- Apply Button -->
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#applyModal">
+            Apply
+        </button>
     {% endif %}
 </div>
+    {% if user.is_authenticated and user.role == "seeker" %}
+    <!-- Modal -->
+    <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'jobposting.apply' jobpost.id %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="applyModalLabel">Apply for {{ jobpost.title }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form.as_p }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
