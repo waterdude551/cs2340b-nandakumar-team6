@@ -1,19 +1,14 @@
-{% extends "base.html" %}
-{% block title %}Create Job Post | JobBoard{% endblock %}
+{% extends 'base.html' %}
 {% block content %}
-
-<body>
-    <h1>Add Post Here</h1>
-    <!--uhhh i need to be able to add posts-->
-    <div class="container mt-4">
-          <div class="row justify-content-center">
-            <div class="col-12">
-              <div class="card shadow p-3 mb-4 rounded">
-                <div class="card-body">
-                  <b class="text-start">Create a Job Posting</b><br /><br />
-                  <form method="POST" action="{% url 'jobposting.createpost' %}">
-                    {% csrf_token %}
-                    <p>
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto mb-3">
+        <h2>Edit Post</h2>
+        <hr />
+        <form method="POST">
+          {% csrf_token %}
+          <p>
                       <label for="title">Title:</label>
                       <textarea name="title" required class="form-control" id="title"></textarea>
                     </p>
@@ -50,6 +45,15 @@
                       </div>
                     </div>
 
+                    <p>
+                      <label for="work_type">Work Type:</label>
+                      <select name="work_type" class="form-control" id="work_type">
+                        <option value="onsite">On-Site</option>
+                        <option value="remote">Remote</option>
+                        <option value="hybrid">Hybrid</option>
+                      </select>
+                    </p>
+
                     <!-- Visa Sponsorship -->
                     <p>
                       <div class="form-check">
@@ -59,16 +63,14 @@
                         </label>
                        </div>
                     </p>
-                    <div class="text-center">
-                      <button type="submit" class="btn bg-dark text-white">
-                        Create Post
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
+          <div class="text-start">
+            <button type="submit" class="btn bg-dark text-white">
+              Edit Review
+            </button>
           </div>
-        </div>
-</body>
-{% endblock %}
+        </form>
+      </div>
+    </div>
+  </div>  
+</div>
+{% endblock content %}

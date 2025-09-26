@@ -8,7 +8,20 @@
 
 <body>
     <h1>{{ template_data.jobPost.title }}</h1>
-    <p>{{ template_data.jobPost.description }}</p>
+    <p class="text-light"><strong>Description:</strong> {{ template_data.jobPost.description }}</p>
 
+    <p class="text-light"><strong>Location:</strong> {{ template_data.jobPost.location }}</p>
+    <p class="text-light"><strong>Salary:</strong> {{ template_data.jobPost.display_salary }}</p>
+    <p class="text-light"><strong>Skills:</strong> {{ template_data.jobPost.skills }}</p>
+    <p class="text-light"><strong>Visa Sponsorship:</strong> {% if template_data.jobPost.visa_sponsorship %}Yes{% else %}No{% endif %}</p>
+    <p>{{user}} {{ template_data.jobPost.user }}</p>
+    {% if user.is_authenticated and user == template_data.jobPost.user %}
+    <a class="btn btn-primary" href="{% url 'jobposting.editpost' id=template_data.jobPost.id %}">
+        Edit
+    </a>
+    <a class="btn btn-danger" href="{% url 'jobposting.deletepost' id=template_data.jobPost.id %}">
+        Delete
+    </a>
+    {% endif %}
 </body>
 {% endblock %}

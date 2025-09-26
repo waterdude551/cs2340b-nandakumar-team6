@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import JobPost
 from django.contrib.auth.decorators import login_required
 """
@@ -62,15 +62,28 @@ def addpost(request):
 #this is the method that makes the new job id
 @login_required
 def createpost(request):
-    print("HIII")
     if request.method == 'POST' and request.POST['title'] != '' and request.POST['description'] != '' and request.POST['qualifications'] != '':
         post = JobPost()
         post.title = request.POST['title']
         post.description = request.POST['description']
         post.qualifications = request.POST['qualifications']
-        post.user = request.user
+        post.skills = request.POST['skills']
+        post.location = request.POST['location']
+        post.salary_min = request.POST['salary_min']
+        post.salary_max = request.POST['salary_max']
+        post.visa_sponsorship = bool(request.POST.get("visa_sponsorship"))
+        #post.user = request.user
         post.save()
         return redirect('jobposting.browsing')
     else:
         return redirect('jobposting.browsing')
     
+@login_required
+def editpost(request, id):
+    post = get_object_or_404(JobPost, id=id)
+    if request.user != post.user:
+        return redirect('jobposting.browsing')
+    
+@login_required
+def deletepost(request, id):
+    post = get_object_or_404(JobPost, id=id)
