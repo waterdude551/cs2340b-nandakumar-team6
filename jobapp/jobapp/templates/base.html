@@ -12,7 +12,7 @@
     <!-- Custom CSS -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <!-- Top navigation bar -->
     <header class="navbar-custom mb-4">
         <nav class="navbar navbar-expand-lg navbar-dark">
@@ -25,12 +25,16 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'accounts.search' %}">View People</a></li>
                         {% if user.is_authenticated %}
                            <li class="nav-item"><a class="nav-link" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a></li>
+                           <li class="nav-item"><a class="nav-link" href="{% url 'accounts.profile' user.id %}">Your Profile</a></li>
                         {% else %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'accounts.login' %}">Log In</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'accounts.signup' %}">Register</a></li>
                         {% endif %}
                         {% if user.role == 'recruiter' %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.addpost' %}">Employers / Post Job</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.addpost' %}">Post Job</a></li>
+                        {% endif %}
+                        {% if user.role == 'seeker' %}
+                        <!-- TODO - show applications -->
                         {% endif %}
                     </ul>
                 </div>
@@ -38,14 +42,14 @@
         </nav>
     </header>
 
-    <div>
+    <main class="flex-fill">
         {% block content %}
 
         {% endblock content %}
-    </div>
+    </main>
     
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer mt-auto">
         <div class="container">
             <span>© 2025 JobBoard</span>
         </div>

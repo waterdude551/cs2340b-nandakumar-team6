@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}JobBoard Find Jobs{% endblock %}
+{% block title %}Home | JobBoard{% endblock %}
 {% block content %}
     <!-- Search section -->
     <section class="search-section">
@@ -23,17 +23,18 @@
 
 
     <!-- Main content -->
-    <main class="main-content">
-        <div class="container text-center">
-            <h1 class="main-title">JobBoard</h1>
-            <p class="mission">Your next job starts here</p>
-            <div class="cta">
+    <main class="main-content d-flex flex-column justify-content-between align-items-center min-vh-70 py-5">
+        <div class="container d-flex flex-column justify-content-between align-items-center h-100" style="min-height:60vh;">
+            <h1 class="main-title mb-4">JobBoard</h1>
+            <p class="mission mb-5">Your next job starts here</p>
+            <div class="cta d-flex flex-column gap-3 w-100 align-items-center">
                 {% if user.role == 'seeker' %}
                     <a href="{% url 'jobposting.browsing' %}" class="btn btn-primary btn-lg">Get Started →</a>
                 {% elif user.role == 'recruiter' %}
                     <a href="{% url 'jobposting.addpost' %}" class="btn btn-primary btn-lg">Post a Job →</a>
                 {% else %}
                     <a href="{% url 'accounts.signup' %}" class="btn btn-primary btn-lg">Sign Up to Get Started →</a>
+                    <a href="{% url 'accounts.login' %}" class="btn btn-secondary btn-lg">Log In to an Existing Account →</a>
                 {% endif %}
             </div>
         </div>

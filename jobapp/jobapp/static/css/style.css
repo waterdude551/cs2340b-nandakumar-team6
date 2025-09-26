@@ -43,14 +43,42 @@ h1 {
     color:aliceblue;
     text-align: center;
     font-family: "Trebuchet MS", sans-serif;
-    font-size: medium;
+    font-size: medium !important;
 }
 
 
-footer {
+.container h1, .main-title, h1.page-title {
+    font-size: 2.5rem !important;
+    font-weight: 700;
+    color: aliceblue;
+    text-align: center;
+    font-family: "Trebuchet MS", sans-serif;
+    margin-bottom: 2rem;
+}
+
+.main-content {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.main-content .cta {
+    margin-top: 2rem;
+    gap: 1.5rem;
+}
+
+footer.footer {
     color:aliceblue !important;
     font-family: "Trebuchet MS", sans-serif;
     font-size: medium;
+    background: #23263a;
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
 }
 
 li {

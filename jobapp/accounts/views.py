@@ -98,17 +98,52 @@ def edit_profile(request, id):
         })
     return render(request, 'accounts/edit_profile.html', {'user': user, 'initial': initial})
 
-@login_required
 def search_users(request):
     query = request.GET.get('q', '')
     user_type = request.GET.get('user_type', 'seeker')
     skills = request.GET.get('skills', '')
-    #search by username or skills
+    education = request.GET.get('education', '')
+    work_experience = request.GET.get('work_experience', '')
+    headline = request.GET.get('headline', '')
+    company = request.GET.get('company', '')
+    recruiter_title = request.GET.get('recruiter_title', '')
     users = User.objects.filter(role=user_type)
+    from django.db.models import Q
     if query:
-        users = users.filter(username__icontains=query)
-    elif skills and user_type == 'seeker':
-        users = users.filter(seeker_profile__skills__icontains=skills)
-    else:
-        users = []
-    return render(request, 'accounts/search.html', {'users': users, 'query': query, 'skills': skills})
+        name_parts = query.strip().split()
+        q_obj = (
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query)
+        )
+        if len(name_parts) >= 2:
+            first, last = name_parts[0], name_parts[-1]
+            q_obj = q_obj | (Q(first_name__icontains=first) & Q(last_name__icontains=last))
+        users = users.filter(q_obj)
+    # Seeker-specific fields
+    if user_type == 'seeker':
+        if skills:
+            users = users.filter(seeker_profile__skills__icontains=skills)
+        if education:
+            users = users.filter(seeker_profile__education__icontains=education)
+        if work_experience:
+            users = users.filter(seeker_profile__work_experience__icontains=work_experience)
+        if headline:
+            users = users.filter(seeker_profile__headline__icontains=headline)
+    # Recruiter-specific fields (example: company, recruiter_title)
+    if user_type == 'recruiter':
+        if company:
+            users = users.filter(first_name__icontains=company)  # Replace with actual recruiter field if exists
+        if recruiter_title:
+            users = users.filter(last_name__icontains=recruiter_title)  # Replace with actual recruiter field if exists
+    return render(request, 'accounts/search.html', {
+        'users': users,
+        'query': query,
+        'skills': skills,
+        'education': education,
+        'work_experience': work_experience,
+        'headline': headline,
+        'company': company,
+        'recruiter_title': recruiter_title,
+        'user_type': user_type
+    })

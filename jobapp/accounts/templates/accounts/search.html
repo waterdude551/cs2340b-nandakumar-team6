@@ -4,12 +4,62 @@
 <div class="container mt-4">
     <h1>Search Users</h1>
     <form method="get" action="{% url 'accounts.search' %}" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search by username" value="{{ query }}">
-            <input type="text" name="skills" class="form-control" placeholder="Search by skills" value="{{ skills }}">
-            <button class="btn btn-primary" type="submit">Search</button>
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label for="user_type" class="form-label">Role</label>
+                <select id="user_type" name="user_type" class="form-select" onchange="toggleRoleFields()">
+                    <option value="seeker" {% if user_type == 'seeker' %}selected{% endif %}>Job Seeker</option>
+                    <option value="recruiter" {% if user_type == 'recruiter' %}selected{% endif %}>Recruiter</option>
+                </select>
+            </div>
+            <hr>
+            <div class="col-md-3">
+                <label for="q" class="form-label">Username or Name</label>
+                <input type="text" name="q" id="q" class="form-control" placeholder="Search by name" value="{{ query }}">
+            </div>
+            <div class="col-md-3 seeker-field">
+                <label for="skills" class="form-label">Skills</label>
+                <input type="text" name="skills" id="skills" class="form-control" placeholder="Search by skills" value="{{ skills }}">
+            </div>
+            <div class="col-md-3 seeker-field">
+                <label for="education" class="form-label">Education</label>
+                <input type="text" name="education" id="education" class="form-control" placeholder="Education" value="{{ education }}">
+            </div>
+            <div class="col-md-3 seeker-field">
+                <label for="work_experience" class="form-label">Work Experience</label>
+                <input type="text" name="work_experience" id="work_experience" class="form-control" placeholder="Work Experience" value="{{ work_experience }}">
+            </div>
+            <div class="col-md-3 recruiter-field" style="display:none;">
+                <label for="company" class="form-label">Company</label>
+                <input type="text" name="company" id="company" class="form-control" placeholder="Company" value="{{ company }}">
+            </div>
+            <div class="col-md-3 recruiter-field" style="display:none;">
+                <label for="recruiter_title" class="form-label">Recruiter Title</label>
+                <input type="text" name="recruiter_title" id="recruiter_title" class="form-control" placeholder="Recruiter Title" value="{{ recruiter_title }}">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col text-end">
+                <button class="btn btn-primary px-4" type="submit">Search</button>
+            </div>
+        </div>
         </div>
     </form>
+    <script>
+    function toggleRoleFields() {
+        var role = document.getElementById('user_type').value;
+        var seekerFields = document.querySelectorAll('.seeker-field');
+        var recruiterFields = document.querySelectorAll('.recruiter-field');
+        if (role === 'seeker') {
+            seekerFields.forEach(f => f.style.display = 'block');
+            recruiterFields.forEach(f => f.style.display = 'none');
+        } else {
+            seekerFields.forEach(f => f.style.display = 'none');
+            recruiterFields.forEach(f => f.style.display = 'block');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', toggleRoleFields);
+    </script>
     {% if users %}
         <ul class="list-group">
             {% for user in users %}

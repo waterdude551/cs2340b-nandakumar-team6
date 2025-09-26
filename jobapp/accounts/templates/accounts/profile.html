@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ profile.username }}'s Profile | JobBoard{% endblock %}
 {% block content %}
 {% load accounts_tags %}
 <!DOCTYPE html>
@@ -15,7 +16,7 @@
     <h1>{{ profile.username }}'s Profile</h1>
     <ul>
         {% if profile.role %}
-            <li><strong>Role:</strong> {{ profile.role }}</li>
+            <li><strong>Role:</strong> {{ profile.get_role_display }}</li>
         {% endif %}
         {% if profile.get_full_name %}
             <li><strong>Name:</strong> {{ profile.get_full_name }}</li>
