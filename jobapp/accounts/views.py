@@ -110,5 +110,5 @@ def search_users(request):
     elif skills and user_type == 'seeker':
         users = users.filter(seeker_profile__skills__icontains=skills)
     else:
-        users = []git
+        users = []
     return render(request, 'accounts/search.html', {'users': users, 'query': query, 'skills': skills})
