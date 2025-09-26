@@ -4,5 +4,40 @@
 
 <body>
     <h1>Add Post Here</h1>
+    <!--uhhh i need to be able to add posts-->
+    <div class="container mt-4">
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <div class="card shadow p-3 mb-4 rounded">
+                <div class="card-body">
+                  <b class="text-start">Create a Job Posting</b><br /><br />
+                  <form method="POST" action="{% url 'jobposting.createpost' %}">
+                    {% csrf_token %}
+                    <p>
+                      <label for="title">Title:</label>
+                      <textarea name="title" required class="form-control" id="title"></textarea>
+                    </p>
+
+                    <p>
+                      <label for="description">Description:</label>
+                      <textarea name="description" required class="form-control" id="description"></textarea>
+                    </p>
+
+                    <p>
+                      <label for="qualifications">Qualifications:</label>
+                      <textarea name="qualifications" required class="form-control" id="qualifications"></textarea>
+                    </p>
+
+                    <div class="text-center">
+                      <button type="submit" class="btn bg-dark text-white">
+                        Create Post
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 </body>
 {% endblock %}

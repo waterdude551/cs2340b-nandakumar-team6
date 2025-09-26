@@ -8,6 +8,18 @@
 
 <body>
     <h1>BLAH BLAH BLAH</h1>
+      {% for jobPost in template_data.jobPosts %}
+      <div class="col-md-4 col-lg-3 mb-2">
+        <div class="p-2 card align-items-center pt-4">
+            <a href="{% url 'jobposting.viewpost' id=jobPost.id %}" class="text-decoration-none text-dark">
+            <h2>{{ jobPost.title }}</h2>
+          <div class="card-body text-center">
+            {{ jobPost.description }}
+          </div>
+        </div>
+        </a>
+      {% endfor %}
+    </div>
 </body>
 
 </html>
