@@ -17,7 +17,7 @@
 
             <hr />
 
-            <form method="POST">
+            <form method="POST" action="{% url 'accounts.signup' %}">
 
               {% csrf_token %}
 

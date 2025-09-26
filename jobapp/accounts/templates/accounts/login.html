@@ -27,7 +27,7 @@
 
             {% endif %}
 
-            <form method="POST">
+            <form method="POST" action="{% url 'accounts.login' %}">
 
               {% csrf_token %}
 
