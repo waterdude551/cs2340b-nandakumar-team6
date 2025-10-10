@@ -71,10 +71,10 @@ class EmailSeekerForm(forms.Form):
     # The seeker's email — displayed but not editable
     to_email = forms.EmailField(
         label="To",
-        disabled=True,
-        required=False,
+        required=True,
         widget=forms.EmailInput(attrs={
             "class": "form-control",
+            'readonly': 'readonly'
         })
     )
 

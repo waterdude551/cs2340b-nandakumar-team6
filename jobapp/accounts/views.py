@@ -3,6 +3,8 @@ from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+
+from django.conf import settings
 from .forms import CustomUserCreationForm, CustomErrorList, EmailSeekerForm
 from .models import User, SeekerProfile
 from django.core.mail import send_mail
@@ -159,18 +161,18 @@ def email_seeker(request, id):
 def send_email(request):
     if request.method == 'POST':
         subject = request.POST.get('subject', '')
-        message = request.POST.get('message', '')
+        message = f"Recruiter {request.user.email} sent you this message:\n\n" + request.POST.get('message', '')
         to_email = request.POST.get('to_email', '')
-        from_email = request.user.email
+        #from_email = request.user.email
 
         send_mail(
             subject,
             message,
-            from_email,
+            settings.EMAIL_HOST_USER,
             [to_email],
             fail_silently=False,
         )
-        messages.success(request, f"Email sent successfully to {to_email}!")
-        return redirect('accounts.search')  # or whatever your recruiter home is
+        messages.success(request, f"Email successfully sent to {to_email}!")
+        return redirect('accounts.search') 
     else:
         return redirect('accounts.search')

@@ -2,9 +2,6 @@
 {% block title %}Email Seeker{% endblock %}
 {% block content %}
 <h2>Email Job Seeker</h2>
-  <p>Welcome!</p>
-  <p>Currently, I am recruiter number {{ recruiter.id }} looking at seeker number {{ seeker.id }}.</p>
-  <p>I want to send a message to this email: <strong>{{ seeker.email }}</strong></p>
 
   <form method="POST" class="mt-4" action="{% url 'accounts.send_email' %}">
     {% csrf_token %}
