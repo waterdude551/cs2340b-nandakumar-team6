@@ -53,25 +53,30 @@ def browsing(request):
     elif visa_sponsorship == 'false':
         jobposts = jobposts.filter(visa_sponsorship=False)
 
-    if request.user.role == "seeker":
+    if request.user.is_authenticated and getattr(request.user, "role", None) == "seeker":
         seekUser = SeekerProfile.objects.get(user=request.user.id)
-        userSkills = seekUser.skills
+        #userSkills = seekUser.skills
+        userSkills = [s.strip().lower() for s in seekUser.skills.split(',')]
         #if no skills just do regular
         if userSkills == "":
             return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
-        
         sortedPosts = []
-        #need to sort by most relevant (aka most skills match up)
-        #now sort jobposts by most skill matches
-        #for each job, check how many skills match
         for job in jobposts:
-            matchedSkills = 0
-            for skill in job.skills:
-                if skill in userSkills: #CHANGE TO BE A LITTLE BROADER
-                    matchedSkills += 1
+            jobSkills = [s.strip().lower() for s in job.skills.split(',')]
+            matchedSkills = len(set(userSkills) & set(jobSkills))
             sortedPosts.append((matchedSkills, job))
-        sorted(sortedPosts, key=lambda x: x[1], reverse=True) #sorts it by most matches to least matches
-        jobposts = [sortedPosts[0] for job in sortedPosts] #gets the actual jobs out (i love python)
+        # sortedPosts = []
+        # #need to sort by most relevant (aka most skills match up)
+        # #now sort jobposts by most skill matches
+        # #for each job, check how many skills match
+        # for job in jobposts:
+        #     matchedSkills = 0
+        #     for skill in job.skills:
+        #         if skill in userSkills: #CHANGE TO BE A LITTLE BROADER
+        #             matchedSkills += 1
+        #     sortedPosts.append((matchedSkills, job))
+        sortedPosts = sorted(sortedPosts, key=lambda x: x[0], reverse=True) #sorts it by most matches to least matches
+        jobposts = [j for sk, j in sortedPosts] #gets the actual jobs out (i love python)
             
     return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
 
