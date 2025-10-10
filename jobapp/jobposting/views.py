@@ -52,6 +52,8 @@ def browsing(request):
         jobposts = jobposts.filter(visa_sponsorship=True)
     elif visa_sponsorship == 'false':
         jobposts = jobposts.filter(visa_sponsorship=False)
+    
+    topjobs = None
 
     if request.user.is_authenticated and getattr(request.user, "role", None) == "seeker":
         seekUser = SeekerProfile.objects.get(user=request.user.id)
@@ -59,7 +61,7 @@ def browsing(request):
         userSkills = [s.strip().lower() for s in seekUser.skills.split(',')]
         #if no skills just do regular
         if userSkills == "":
-            return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
+            return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts, 'topjobs': topjobs})
         sortedPosts = []
         for job in jobposts:
             jobSkills = [s.strip().lower() for s in job.skills.split(',')]
@@ -77,8 +79,9 @@ def browsing(request):
         #     sortedPosts.append((matchedSkills, job))
         sortedPosts = sorted(sortedPosts, key=lambda x: x[0], reverse=True) #sorts it by most matches to least matches
         jobposts = [j for sk, j in sortedPosts] #gets the actual jobs out (i love python)
-            
-    return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
+        topjobs = jobposts[0:3] #first 3 jobs
+        jobposts = jobposts[3:]
+    return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts, 'topjobs': topjobs})
 
 #shows one job post in detail
 def viewpost(request, id):
