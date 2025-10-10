@@ -66,3 +66,34 @@ class SeekerProfileForm(forms.ModelForm):
             except ValidationError:
                 raise ValidationError(f"'{link}' is not a valid URL.")
         return links
+
+class EmailSeekerForm(forms.Form):
+    # The seeker's email — displayed but not editable
+    to_email = forms.EmailField(
+        label="To",
+        disabled=True,
+        required=False,
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+        })
+    )
+
+    # Subject line for the message
+    subject = forms.CharField(
+        label="Subject",
+        max_length=255,
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter subject"
+        })
+    )
+
+    # Email body
+    message = forms.CharField(
+        label="Message",
+        widget=forms.Textarea(attrs={
+            "class": "form-control",
+            "rows": 6,
+            "placeholder": "Write your message here..."
+        })
+    )

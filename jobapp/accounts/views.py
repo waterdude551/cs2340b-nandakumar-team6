@@ -3,8 +3,10 @@ from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm, CustomErrorList
+from .forms import CustomUserCreationForm, CustomErrorList, EmailSeekerForm
 from .models import User, SeekerProfile
+from django.core.mail import send_mail
+from django.contrib import messages
 
 
 @login_required
@@ -151,5 +153,24 @@ def search_users(request):
 def email_seeker(request, id):
     recruiter = request.user
     seeker = get_object_or_404(User, id=id)
-    print(seeker.id)
-    return render(request, 'accounts/email_seeker.html', {'recruiter': recruiter, 'seeker': seeker})
+    form = EmailSeekerForm(initial={'to_email': seeker.email})
+    return render(request, 'accounts/email_seeker.html', {'recruiter': recruiter, 'seeker': seeker, 'form': form})
+
+def send_email(request):
+    if request.method == 'POST':
+        subject = request.POST.get('subject', '')
+        message = request.POST.get('message', '')
+        to_email = request.POST.get('to_email', '')
+        from_email = request.user.email
+
+        send_mail(
+            subject,
+            message,
+            from_email,
+            [to_email],
+            fail_silently=False,
+        )
+        messages.success(request, f"Email sent successfully to {to_email}!")
+        return redirect('accounts.search')  # or whatever your recruiter home is
+    else:
+        return redirect('accounts.search')
