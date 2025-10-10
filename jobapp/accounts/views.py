@@ -147,3 +147,9 @@ def search_users(request):
         'recruiter_title': recruiter_title,
         'user_type': user_type
     })
+
+def email_seeker(request, id):
+    recruiter = request.user
+    seeker = get_object_or_404(User, id=id)
+    print(seeker.id)
+    return render(request, 'accounts/email_seeker.html', {'recruiter': recruiter, 'seeker': seeker})
