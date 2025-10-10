@@ -55,7 +55,7 @@ class UserChangeForm(UserChangeForm):
 class SeekerProfileForm(forms.ModelForm):
     class Meta:
         model = SeekerProfile
-        fields = ['headline', 'skills', 'education', 'work_experience', 'links']
+        fields = ['headline', 'skills', 'education', 'work_experience', 'links', 'email']
 
     def clean_links(self):
         links = self.cleaned_data['links']
