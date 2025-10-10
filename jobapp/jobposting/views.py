@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import JobPost, JobApplication
+from accounts.models import SeekerProfile
 """
 GOALS:
     - should have a model called job post (DONE)
@@ -52,6 +53,26 @@ def browsing(request):
     elif visa_sponsorship == 'false':
         jobposts = jobposts.filter(visa_sponsorship=False)
 
+    if request.user.role == "seeker":
+        seekUser = SeekerProfile.objects.get(user=request.user.id)
+        userSkills = seekUser.skills
+        #if no skills just do regular
+        if userSkills == "":
+            return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
+        
+        sortedPosts = []
+        #need to sort by most relevant (aka most skills match up)
+        #now sort jobposts by most skill matches
+        #for each job, check how many skills match
+        for job in jobposts:
+            matchedSkills = 0
+            for skill in job.skills:
+                if skill in userSkills: #CHANGE TO BE A LITTLE BROADER
+                    matchedSkills += 1
+            sortedPosts.append((matchedSkills, job))
+        sorted(sortedPosts, key=lambda x: x[1], reverse=True) #sorts it by most matches to least matches
+        jobposts = [sortedPosts[0] for job in sortedPosts] #gets the actual jobs out (i love python)
+            
     return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
 
 #shows one job post in detail
