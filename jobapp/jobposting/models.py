@@ -26,6 +26,13 @@ class JobPost(models.Model):
     description = models.CharField(max_length=1000)
     qualifications = models.CharField(max_length=1000)
 
+    # object names in admin
+    def __str__(self):
+        str = "{recruiter} - {title} - ({id})"
+        return str.format(recruiter = self.recruiter,
+                        title=self.title,
+                        id=self.id)
+
 class JobApplication(models.Model):
     id = models.AutoField(primary_key=True)
     STAGE_CHOICES = [
