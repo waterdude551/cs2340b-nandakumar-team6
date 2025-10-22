@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import JobPost, JobApplication
+from .forms import JobPostForm, JobApplicationForm
 """
 GOALS:
     - should have a model called job post (DONE)
@@ -157,3 +158,12 @@ def update_application_stage(request, application_id, jobpost_id):
             application.stage = new_stage
             application.save()
     return redirect('jobposting.list_applications', jobpost_id=jobpost.id)
+
+@login_required
+def seeker_applications(request):
+    if getattr(request.user, "role", None) != "seeker":
+        return HttpResponseForbidden("You are not authorized to view this page.")
+
+    applications = JobApplication.objects.filter(seeker=request.user).order_by('-applied_at').select_related('job_post')
+
+    return render(request, 'jobposting/seeker_applications.html', {'applications': applications})

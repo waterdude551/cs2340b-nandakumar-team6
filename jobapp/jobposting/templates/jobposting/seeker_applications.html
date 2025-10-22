@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Your Applications | JobBoard{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="page-title">Your Job Applications</h1>
+    {% if applications %}
+        <div class="table-responsive">
+            <table class="table table-striped table-dark">
+                <thead class="job-dark">
+                    <tr>
+                        <th class="text-light">Job Title</th>
+                        <th class="text-light">Status</th>
+                        <th class="text-light">Applied On</th>
+                        <th class="text-light">Note</th>
+                        <th class="text-light">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for application in applications %}
+                    <tr>
+                        <td><a href="{% url 'jobposting.viewpost' application.job_post.id %}" class="text-info">{{ application.job_post.title }}</a></td>
+                        <td>
+                            {% if application.stage == 'applied' %}
+                                <span class="badge bg-secondary">{{ application.get_stage_display }}</span>
+                            {% elif application.stage == 'under_review' %}
+                                <span class="badge bg-warning text-dark">{{ application.get_stage_display }}</span>
+                            {% elif application.stage == 'interview' %}
+                                <span class="badge bg-primary">{{ application.get_stage_display }}</span>
+                            {% elif application.stage == 'offer' %}
+                                <span class="badge bg-success">{{ application.get_stage_display }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ application.get_stage_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ application.applied_at|date:'Y-m-d' }}</td>
+                        <td>
+                            {% if application.note %}
+                                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#noteModal{{ application.id }}">
+                                    View Note
+                                </button>
+                                <div class="modal fade" id="noteModal{{ application.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ application.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="noteModalLabel{{ application.id }}">Application Note for {{ application.job_post.title }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {{ application.note|linebreaksbr }}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">None</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'jobposting.viewpost' application.job_post.id %}" class="btn btn-sm btn-outline-info">View Job</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-light">You have not submitted any job applications yet. Go find your next opportunity!</p>
+        <p><a href="{% url 'jobposting.browsing' %}" class="btn btn-primary">Find Jobs</a></p>
+    {% endif %}
+</div>
+{% endblock %}
