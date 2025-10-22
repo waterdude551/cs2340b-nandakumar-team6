@@ -1,15 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-{% load static %}
 
-<meta charset="utf-8" />
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-</script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
   #map {
@@ -20,14 +13,46 @@
 
 <div id="map"></div>
 
+<script id="jobs-data" type="application/json">
+{{ jobs_json|safe }}
+</script>
+
 <script>
-    // Initialize map after DOM element exists
-    const map = L.map('map').setView([20, 0], 2);
+    const jobs = JSON.parse(document.getElementById('jobs-data').textContent);
+    
+    // Initialize map with default location
+    const map = L.map('map').setView([39.8283, -98.5795], 4);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
+
+    // Get user location from IP and recenter map
+    fetch('http://ip-api.com/json/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.lat && data.lon) {
+                map.setView([data.lat, data.lon], 10);
+            }
+        })
+        .catch(error => {
+            console.log('Could not get user location:', error);
+        });
+
+    // Add markers for each job
+    jobs.forEach(job => {
+        const popupContent = '<strong>' + job.title + '</strong><br>' +
+                           job.location + '<br>' +
+                           (job.salary ? 'Salary: ' + job.salary + '<br>' : '') +
+                           job.remote_type + '<br>' +
+                           (job.skills ? 'Skills: ' + job.skills + '<br>' : '') +
+                           '<a href="/job/' + job.id + '/">View Details</a>';
+        
+        L.marker([job.latitude, job.longitude])
+            .addTo(map)
+            .bindPopup(popupContent);
+    });
 </script>
 
-{% endblock content %}
+{% endblock %}
