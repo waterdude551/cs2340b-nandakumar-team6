@@ -34,7 +34,7 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.addpost' %}">Post Job</a></li>
                         {% endif %}
                         {% if user.role == 'seeker' %}
-                        <!-- TODO - show applications -->
+                        <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.seeker_applications' %}">Your Applications</a></li>
                         {% endif %}
                     </ul>
                 </div>
