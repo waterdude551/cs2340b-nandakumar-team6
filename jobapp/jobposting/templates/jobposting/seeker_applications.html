@@ -38,11 +38,11 @@
                                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#noteModal{{ application.id }}">
                                     View Note
                                 </button>
-                                <div class="modal fade" id="noteModal{{ application.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ application.id }}" aria-hidden="true">
+                                <div class="modal fade text-dark" id="noteModal{{ application.id }}" tabindex="-1" aria-labelledby="noteModalLabel{{ application.id }}" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="noteModalLabel{{ application.id }}">Application Note for {{ application.job_post.title }}</h5>
+                                                <h5 class="modal-title text-dark" id="noteModalLabel{{ application.id }}">Application Note for {{ application.job_post.title }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
