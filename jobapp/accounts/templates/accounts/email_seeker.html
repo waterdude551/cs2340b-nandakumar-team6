@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Email Seeker{% endblock %}
+{% block content %}
+<h2>Email Job Seeker</h2>
+
+  <form method="POST" class="mt-4" action="{% url 'accounts.send_email' %}">
+    {% csrf_token %}
+    <!-- Render form fields manually for more control -->
+    <div class="mb-3">
+      <label for="id_to_email" class="form-label">To</label>
+      {{ form.to_email }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_subject" class="form-label">Subject</label>
+      {{ form.subject }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_message" class="form-label">Message</label>
+      {{ form.message }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Send Email</button>
+  </form>
+</div>
+{% endblock content %}
