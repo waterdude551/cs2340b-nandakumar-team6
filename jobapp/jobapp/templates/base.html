@@ -34,7 +34,9 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.addpost' %}">Post Job</a></li>
                         {% endif %}
                         {% if user.role == 'seeker' %}
+                        <!-- first is status tracker for seekers, second is map -->
                         <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.seeker_applications' %}">Your Applications</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'map.show' %}">Map</a></li>
                         {% endif %}
                     </ul>
                 </div>
