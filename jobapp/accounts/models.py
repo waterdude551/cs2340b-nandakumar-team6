@@ -22,3 +22,4 @@ class SeekerProfile(models.Model):
     education = models.CharField(max_length=200, default="")
     work_experience = models.CharField(max_length=200, default="")
     links = models.CharField(max_length=300, default="")
+    email = models.CharField(max_length=300, default="")

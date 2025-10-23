@@ -30,13 +30,13 @@
 </div>
     {% if user.is_authenticated and user.role == "seeker" %}
     <!-- Modal -->
-    <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+    <div class="modal fade text-dark" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form method="post" action="{% url 'jobposting.apply' jobpost.id %}">
                     {% csrf_token %}
                     <div class="modal-header">
-                        <h5 class="modal-title" id="applyModalLabel">Apply for {{ jobpost.title }}</h5>
+                        <h5 class="modal-title text-dark" id="applyModalLabel">Apply for {{ jobpost.title }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">

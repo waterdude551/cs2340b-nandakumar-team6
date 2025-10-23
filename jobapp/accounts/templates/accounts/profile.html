@@ -48,10 +48,18 @@
             {% endif %}
         {% endif %}
         <!-- Add recruiter-specific fields here if needed -->
+        {% if user.is_authenticated and user.role == "recruiter" and profile.role == "seeker" and profile.email and user.email %}
+            <a href="{% url 'accounts.email_seeker' profile.id %}" class="btn btn-primary">Email Seeker</a>
+        {% endif %}
     </ul>
 
-    {% if user.is_authenticated and user.id == profile.id %}
-        <a href="{% url 'accounts.edit_profile' profile.id %}">Edit Profile</a>
+    {% if user.is_authenticated and user.id == profile.id %}    
+    <div class="mt-3">
+            {% if user.role == "seeker" %}
+                <a href="{% url 'jobposting.seeker_applications' %}" class="btn btn-info me-2">View Your Applications</a>
+            {% endif %}
+            <a href="{% url 'accounts.edit_profile' profile.id %}" class="btn btn-warning">Edit Profile</a>
+        </div>
     {% endif %}
 </body>
 {% endblock %}

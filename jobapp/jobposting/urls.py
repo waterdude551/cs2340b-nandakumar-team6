@@ -9,4 +9,5 @@ urlpatterns = [
     path('edit/<int:id>/', views.edit_post, name='jobposting.edit_post'), #goes to edit specific post
     path('<int:jobpost_id>/applications/', views.list_applications, name='jobposting.list_applications'), # list applications for a job post
     path('application/<int:application_id>/<int:jobpost_id>/update_stage/', views.update_application_stage, name='jobposting.update_application_stage'),
+    path('my-applications/', views.seeker_applications, name='jobposting.seeker_applications'),
 ]
