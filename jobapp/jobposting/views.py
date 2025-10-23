@@ -54,14 +54,15 @@ def browsing(request):
     elif visa_sponsorship == 'false':
         jobposts = jobposts.filter(visa_sponsorship=False)
 
-    userSkills = None
     #if user is seeker, get their skills
-    if request.user.is_authenticated and request.user.role == "seeker":
-        seekUser = SeekerProfile.objects.get(user=request.user.id)
-        userSkills = seekUser.skills
+    if not request.user.is_authenticated or not request.user.role == "seeker":
+        return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts, 'topjobs': None})
+    
+    seekUser = SeekerProfile.objects.get(user=request.user.id)
+    userSkills = seekUser.skills
     #if didn't put skills OR is not a seeker, treat like regular user
     if not userSkills:
-        return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
+        return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts, 'topjobs': None})
 
     sortedPosts = []
     userSkillList = [skill.strip().lower() for skill in userSkills.split(",")]
