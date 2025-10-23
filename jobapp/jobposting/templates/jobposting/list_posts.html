@@ -50,7 +50,13 @@
             {% for job in topjobs %}
                 <li class="list-group-item border-success job-dark mb-3">
                     <h4>{{ job.title }}</h4>
-                    <p><strong>Location:</strong> {{ job.location }}</p>
+                    <p><strong>Location:</strong>
+                        {% if job.get_remote_type_display == "Remote" %}
+                            Remote
+                        {% else %}
+                            {{ job.location }}
+                        {% endif %}
+                    </p>
                     <p><strong>Skills:</strong> {{ job.skills }}</p>
                     <p><strong>Salary:</strong> {{ job.salary }}</p>
                     <p><strong>Remote/On-site:</strong> {{ job.get_remote_type_display }}</p>
@@ -66,7 +72,13 @@
             {% for job in jobposts %}
                 <li class="list-group-item job-dark mb-3">
                     <h4>{{ job.title }}</h4>
-                    <p><strong>Location:</strong> {{ job.location }}</p>
+                    <p><strong>Location:</strong>
+                        {% if job.get_remote_type_display == "Remote" %}
+                            Remote
+                        {% else %}
+                            {{ job.location }}
+                        {% endif %}
+                    </p>
                     <p><strong>Skills:</strong> {{ job.skills }}</p>
                     <p><strong>Salary:</strong> {{ job.salary }}</p>
                     <p><strong>Remote/On-site:</strong> {{ job.get_remote_type_display }}</p>

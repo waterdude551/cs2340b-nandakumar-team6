@@ -4,6 +4,7 @@
 <h1>Edit Job Post</h1>
 <form method="post">
     {% csrf_token %}
+    {{form.errors}}
     <ul>
         <li>
             <label for="id_title">Title:</label>
@@ -13,9 +14,18 @@
             <label for="id_skills">Skills:</label>
             <input type="text" name="skills" id="id_skills" value="{{ form.skills.value|default_if_none:'' }}">
         </li>
+        
         <li>
-            <label for="id_location">Location:</label>
-            <input type="text" name="location" id="id_location" value="{{ form.location.value|default_if_none:'' }}">
+            <label for="id_city">City:</label>
+            <input type="text" name="city" id="id_city" value="{{ form.city.value|default_if_none:'' }}">
+        </li>
+        <li>
+            <label for="id_state">State:</label>
+            <input type="text" name="state" id="id_state" value="{{ form.state.value|default_if_none:'' }}">
+        </li>
+        <li>
+            <label for="id_country">Country:</label>
+            <input type="text" name="country" id="id_country" value="{{ form.country.value|default_if_none:'' }}">
         </li>
         <li>
             <label for="id_salary">Salary:</label>
@@ -41,6 +51,7 @@
             <label for="id_qualifications">Qualifications:</label>
             <textarea name="qualifications" id="id_qualifications">{{ form.qualifications.value|default_if_none:'' }}</textarea>
         </li>
+        
     </ul>
     <button class="btn btn-primary" type="submit" name="save_exit">Save and Exit</button>
     <a href="{% url 'jobposting.viewpost' jobpost.id %}" class="btn btn-secondary">Cancel</a>
