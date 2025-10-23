@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import JobPost, JobApplication
 from .forms import JobPostForm, JobApplicationForm
+from accounts.models import SeekerProfile
 """
 GOALS:
     - should have a model called job post (DONE)
@@ -53,7 +54,30 @@ def browsing(request):
     elif visa_sponsorship == 'false':
         jobposts = jobposts.filter(visa_sponsorship=False)
 
-    return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts})
+    #if user is seeker, get their skills
+    if not request.user.is_authenticated or not request.user.role == "seeker":
+        return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts, 'topjobs': None})
+    
+    seekUser = SeekerProfile.objects.get(user=request.user.id)
+    userSkills = seekUser.skills
+    #if didn't put skills OR is not a seeker, treat like regular user
+    if not userSkills:
+        return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts, 'topjobs': None})
+
+    sortedPosts = []
+    userSkillList = [skill.strip().lower() for skill in userSkills.split(",")]
+
+    for job in jobposts:
+        jobSkillList = [skill.strip().lower() for skill in job.skills.split(",")]
+        matchedSkills = sum(skill in userSkillList for skill in jobSkillList)
+        sortedPosts.append((matchedSkills, job))
+
+    sortedPosts = sorted(sortedPosts, key=lambda x: x[0], reverse=True)
+    sortedPosts = [job for _, job in sortedPosts]
+    jobposts = sortedPosts[3:]
+    topjobs = sortedPosts[:3]
+
+    return render(request, 'jobposting/list_posts.html', {'jobposts': jobposts, 'topjobs': topjobs})
 
 #shows one job post in detail
 def viewpost(request, id):
