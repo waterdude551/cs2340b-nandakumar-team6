@@ -50,6 +50,9 @@
         <!-- Add recruiter-specific fields here if needed -->
         {% if user.is_authenticated and user.role == "recruiter" and profile.role == "seeker" and profile.email and user.email %}
             <a href="{% url 'accounts.email_seeker' profile.id %}" class="btn btn-primary">Email Seeker</a>
+        
+        {% elif user.is_authenticated and user.role == "recruiter" and profile.role == "seeker" and profile.email %}
+                <text class="text-light">Add your contact information to email this potential candidate!</text>
         {% endif %}
     </ul>
 
