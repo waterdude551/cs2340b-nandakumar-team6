@@ -1,33 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Messages | JobBoard{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>Your Conversations</h1>
-    
-    {% if conversations %}
-        <div class="conversation-list">
-            {% for convo in conversations %}
-                <div class="conversation-item">
-                    <a href="{% url 'chat.show_convo' convo.id %}">
-                        {% if user == convo.recruiter %}
-                            <strong>{{ convo.seeker.username }}</strong>
-                        {% else %}
-                            <strong>{{ convo.recruiter.username }}</strong>
-                        {% endif %}
-                        
-                        {% if convo.messages.last %}
-                            <p>{{ convo.messages.last.text|truncatewords:10 }}</p>
-                            <small>{{ convo.messages.last.sent_at|timesince }} ago</small>
-                        {% endif %}
-                    </a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Your Conversations</h3>
+                    {% if user.is_authenticated and user.role == 'recruiter' %}
+                        <a href="{% url 'chat.start_convo' %}" class="btn btn-primary btn-sm">
+                            New Conversation
+                        </a>
+                    {% endif %}
                 </div>
-            {% endfor %}
+                <div class="card-body p-0">
+                    {% if conversations %}
+                        <div class="list-group list-group-flush">
+                            {% for convo in conversations %}
+                                <a href="{% url 'chat.show_convo' convo.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                {% if user == convo.recruiter %}
+                                                    {{ convo.seeker.username }}
+                                                {% else %}
+                                                    {{ convo.recruiter.username }}
+                                                {% endif %}
+                                            </h6>
+                                            {% if convo.messages.last %}
+                                                <p class="mb-1 text-muted">{{ convo.messages.last.text|truncatewords:10 }}</p>
+                                                <small class="text-muted">{{ convo.messages.last.sent_at|timesince }} ago</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted mb-3">No conversations yet.</p>
+                            {% if user.is_authenticated and user.role == 'recruiter' %}
+                                <a href="{% url 'chat.start_convo' %}" class="btn btn-primary">
+                                    Start Your First Conversation
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-    {% else %}
-        <p>No conversations yet.</p>
-    {% endif %}
-    {% if user.is_authenticated and user.role == 'recruiter' %}
-        <a href="{% url 'chat.start_convo' %}" class="btn">Start New Conversation</a>
-    {% endif %}
+    </div>
 </div>
 {% endblock %}

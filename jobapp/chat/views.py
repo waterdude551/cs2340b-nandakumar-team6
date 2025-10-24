@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from accounts.models import User
 from .models import Conversation, Message
+from .forms import StartConversationForm
 
 @login_required
 def list_convos(request):
@@ -53,33 +54,11 @@ def start_convo(request):
     if request.user.role != 'recruiter':
         return redirect('chat.list_convos')
     
-    # Get seekers that this recruiter hasn't already started a conversation with
-    existing_convos = Conversation.objects.filter(recruiter=request.user)
-    existing_seeker_ids = existing_convos.values_list('seeker_id', flat=True)
-    
-    available_seekers = User.objects.filter(
-        role='seeker'
-    ).exclude(
-        id__in=existing_seeker_ids
-    )
-    
-    context = {'available_seekers': available_seekers}
-    return render(request, 'chat/start_convo.html', context)
-
-
-@login_required
-def create_convo(request):
-    """Actually create the conversation and first message"""
-    
-    if request.user.role != 'recruiter':
-        return redirect('chat.list_convos')
-    
     if request.method == 'POST':
-        seeker_id = request.POST.get('seeker_id')
-        text = request.POST.get('message')
-        
-        if seeker_id and text:
-            seeker = get_object_or_404(User, id=seeker_id)
+        form = StartConversationForm(request.POST, recruiter=request.user)
+        if form.is_valid():
+            seeker = form.cleaned_data['seeker']
+            text = form.cleaned_data['message']
             
             # Check if conversation already exists
             existing_convo = Conversation.objects.filter(
@@ -104,5 +83,8 @@ def create_convo(request):
             )
             
             return redirect('chat.show_convo', conversation_id=conversation.id)
+    else:
+        form = StartConversationForm(recruiter=request.user)
     
-    return redirect('chat.start_convo')
+    context = {'form': form}
+    return render(request, 'chat/start_convo.html', context)
