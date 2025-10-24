@@ -63,7 +63,7 @@
     const jobs = JSON.parse(document.getElementById('jobs-data').textContent);
     let userLocation = null;
     let allMarkers = [];
-    
+
     // Initialize map with default location
     const map = L.map('map').setView([39.8283, -98.5795], 4);
 
@@ -88,7 +88,7 @@
     function filterJobsByDistance() {
         const distanceInput = document.getElementById('distance-input').value;
         const maxDistance = parseFloat(distanceInput);
-        
+
         if (!maxDistance || maxDistance <= 0) {
             alert('Please enter a valid distance');
             return;
@@ -108,7 +108,7 @@
                 markerData.job.latitude,
                 markerData.job.longitude
             );
-            
+
             if (distance <= maxDistance) {
                 markerData.marker.addTo(map);
                 visibleCount++;
@@ -118,7 +118,7 @@
         });
 
         // Update job count
-        document.getElementById('job-count').textContent = 
+        document.getElementById('job-count').textContent =
             `Showing ${visibleCount} of ${jobs.length} jobs within ${maxDistance} miles`;
     }
 
@@ -127,22 +127,24 @@
         allMarkers.forEach(markerData => {
             markerData.marker.addTo(map);
         });
-        
-        document.getElementById('job-count').textContent = 
+
+        document.getElementById('job-count').textContent =
             `Showing ${jobs.length} of ${jobs.length} jobs`;
         document.getElementById('distance-input').value = '';
     }
 
     // Get user location from IP and recenter map
-    fetch('http://ip-api.com/json/')
-        .then(response => response.json())
-        .then(data => {
-            if (data.lat && data.lon) {
-                userLocation = { lat: data.lat, lon: data.lon };
-                map.setView([data.lat, data.lon], 10);
-                
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude
+                };
+                map.setView([userLocation.lat, userLocation.lon], 10);
+
                 // Add user location marker
-                L.marker([data.lat, data.lon], {
+                L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.icon({
                         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
                         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -152,11 +154,15 @@
                         shadowSize: [41, 41]
                     })
                 }).addTo(map).bindPopup('Your Location');
+            },
+            function(error) {
+                console.log('Geolocation error:', error);
+                alert('Could not get your location. Please allow location access or check your browser settings.');
             }
-        })
-        .catch(error => {
-            console.log('Could not get user location:', error);
-        });
+        );
+    } else {
+        console.log('Geolocation not supported by browser');
+    }
 
     // Create markers for all jobs
     jobs.forEach(job => {
@@ -166,16 +172,16 @@
                            job.remote_type + '<br>' +
                            (job.skills ? 'Skills: ' + job.skills + '<br>' : '') +
                            '<a href="/jobposting/' + job.id + '/">View Details</a>'; //link should work now!
-        
+
         const marker = L.marker([job.latitude, job.longitude])
             .bindPopup(popupContent);
-        
+
         allMarkers.push({ marker: marker, job: job });
         marker.addTo(map);
     });
 
     // Update job count initially
-    document.getElementById('job-count').textContent = 
+    document.getElementById('job-count').textContent =
         `Showing ${jobs.length} of ${jobs.length} jobs`;
 
     // Allow Enter key to trigger filter
