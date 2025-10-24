@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
 from .forms import CustomUserCreationForm, CustomErrorList, EmailSeekerForm
-from .models import User, SeekerProfile
+from .models import User, SeekerProfile, SavedFilter
 from django.core.mail import send_mail
 from django.contrib import messages
 
@@ -108,6 +108,15 @@ def edit_profile(request, id):
     return render(request, 'accounts/edit_profile.html', {'user': user, 'initial': initial})
 
 def search_users(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        filter_name = request.POST.get('filter_name')
+        filters = request.GET.dict()
+
+        if filter_name and filters:
+            SavedFilter.objects.create(user=request.user, name=filter_name, filters=filters)
+        
+        return redirect(request.path_info + '?' + request.GET.urlencode())
+
     query = request.GET.get('q', '')
     user_type = request.GET.get('user_type', 'seeker')
     skills = request.GET.get('skills', '')
@@ -116,7 +125,9 @@ def search_users(request):
     headline = request.GET.get('headline', '')
     company = request.GET.get('company', '')
     recruiter_title = request.GET.get('recruiter_title', '')
+    
     users = User.objects.filter(role=user_type)
+    
     from django.db.models import Q
     if query:
         name_parts = query.strip().split()
@@ -129,7 +140,7 @@ def search_users(request):
             first, last = name_parts[0], name_parts[-1]
             q_obj = q_obj | (Q(first_name__icontains=first) & Q(last_name__icontains=last))
         users = users.filter(q_obj)
-    # Seeker-specific fields
+
     if user_type == 'seeker':
         if skills:
             users = users.filter(seeker_profile__skills__icontains=skills)
@@ -139,13 +150,18 @@ def search_users(request):
             users = users.filter(seeker_profile__work_experience__icontains=work_experience)
         if headline:
             users = users.filter(seeker_profile__headline__icontains=headline)
-    # Recruiter-specific fields (example: company, recruiter_title)
+    
     if user_type == 'recruiter':
         if company:
-            users = users.filter(first_name__icontains=company)  # Replace with actual recruiter field if exists
+            users = users.filter(first_name__icontains=company)
         if recruiter_title:
-            users = users.filter(last_name__icontains=recruiter_title)  # Replace with actual recruiter field if exists
-    return render(request, 'accounts/search.html', {
+            users = users.filter(last_name__icontains=recruiter_title)
+
+    saved_filters = []
+    if request.user.is_authenticated:
+        saved_filters = SavedFilter.objects.filter(user=request.user)
+
+    context = {
         'users': users,
         'query': query,
         'skills': skills,
@@ -154,8 +170,11 @@ def search_users(request):
         'headline': headline,
         'company': company,
         'recruiter_title': recruiter_title,
-        'user_type': user_type
-    })
+        'user_type': user_type,
+        'saved_filters': saved_filters,
+    }
+
+    return render(request, 'accounts/search.html', context)
 
 def email_seeker(request, id):
     recruiter = request.user
@@ -181,3 +200,9 @@ def send_email(request):
         return redirect('accounts.search') 
     else:
         return redirect('accounts.search')
+    
+@login_required
+def delete_filter(request, filter_id):
+    filter_to_delete = get_object_or_404(SavedFilter, id=filter_id, user=request.user)
+    filter_to_delete.delete()
+    return redirect('accounts.search')

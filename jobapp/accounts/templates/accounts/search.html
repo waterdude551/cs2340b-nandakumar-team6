@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
+{% load custom_filters %} {# <-- IMPORTANT: Load the custom filter at the top #}
+
 {% block title %}Search Users | JobBoard{% endblock %}
+
 {% block content %}
 {% if messages %}
   <div class="container mt-3">
@@ -11,51 +14,110 @@
     {% endfor %}
   </div>
 {% endif %}
+
 <div class="container mt-4">
-    <h1>Search Users</h1>
-    <form method="get" action="{% url 'accounts.search' %}" class="mb-4">
-        <div class="row g-2 align-items-end">
-            <div class="col-md-3">
-                <label for="user_type" class="form-label">Role</label>
-                <select id="user_type" name="user_type" class="form-select" onchange="toggleRoleFields()">
-                    <option value="seeker" {% if user_type == 'seeker' %}selected{% endif %}>Job Seeker</option>
-                    <option value="recruiter" {% if user_type == 'recruiter' %}selected{% endif %}>Recruiter</option>
-                </select>
-            </div>
+    <div class="row">
+        <div class="col-md-9">
+            <h1>Search Users</h1>
+            <form method="get" action="{% url 'accounts.search' %}" class="mb-4 p-3 border rounded">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label for="user_type" class="form-label">Role</label>
+                        <select id="user_type" name="user_type" class="form-select" onchange="toggleRoleFields()">
+                            <option value="seeker" {% if user_type == 'seeker' %}selected{% endif %}>Job Seeker</option>
+                            <option value="recruiter" {% if user_type == 'recruiter' %}selected{% endif %}>Recruiter</option>
+                        </select>
+                    </div>
+                    <hr>
+                    <div class="col-md-3">
+                        <label for="q" class="form-label">Username or Name</label>
+                        <input type="text" name="q" id="q" class="form-control" placeholder="Search by name" value="{{ query }}">
+                    </div>
+                    <div class="col-md-3 seeker-field">
+                        <label for="skills" class="form-label">Skills</label>
+                        <input type="text" name="skills" id="skills" class="form-control" placeholder="Search by skills" value="{{ skills }}">
+                    </div>
+                    <div class="col-md-3 seeker-field">
+                        <label for="education" class="form-label">Education</label>
+                        <input type="text" name="education" id="education" class="form-control" placeholder="Education" value="{{ education }}">
+                    </div>
+                    <div class="col-md-3 seeker-field">
+                        <label for="work_experience" class="form-label">Work Experience</label>
+                        <input type="text" name="work_experience" id="work_experience" class="form-control" placeholder="Work Experience" value="{{ work_experience }}">
+                    </div>
+                    <div class="col-md-3 recruiter-field" style="display:none;">
+                        <label for="company" class="form-label">Company</label>
+                        <input type="text" name="company" id="company" class="form-control" placeholder="Company" value="{{ company }}">
+                    </div>
+                    <div class="col-md-3 recruiter-field" style="display:none;">
+                        <label for="recruiter_title" class="form-label">Recruiter Title</label>
+                        <input type="text" name="recruiter_title" id="recruiter_title" class="form-control" placeholder="Recruiter Title" value="{{ recruiter_title }}">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col text-end">
+                        <button class="btn btn-primary px-4" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+
             <hr>
-            <div class="col-md-3">
-                <label for="q" class="form-label">Username or Name</label>
-                <input type="text" name="q" id="q" class="form-control" placeholder="Search by name" value="{{ query }}">
-            </div>
-            <div class="col-md-3 seeker-field">
-                <label for="skills" class="form-label">Skills</label>
-                <input type="text" name="skills" id="skills" class="form-control" placeholder="Search by skills" value="{{ skills }}">
-            </div>
-            <div class="col-md-3 seeker-field">
-                <label for="education" class="form-label">Education</label>
-                <input type="text" name="education" id="education" class="form-control" placeholder="Education" value="{{ education }}">
-            </div>
-            <div class="col-md-3 seeker-field">
-                <label for="work_experience" class="form-label">Work Experience</label>
-                <input type="text" name="work_experience" id="work_experience" class="form-control" placeholder="Work Experience" value="{{ work_experience }}">
-            </div>
-            <div class="col-md-3 recruiter-field" style="display:none;">
-                <label for="company" class="form-label">Company</label>
-                <input type="text" name="company" id="company" class="form-control" placeholder="Company" value="{{ company }}">
-            </div>
-            <div class="col-md-3 recruiter-field" style="display:none;">
-                <label for="recruiter_title" class="form-label">Recruiter Title</label>
-                <input type="text" name="recruiter_title" id="recruiter_title" class="form-control" placeholder="Recruiter Title" value="{{ recruiter_title }}">
-            </div>
+
+            <h3>Results</h3>
+            {% if users %}
+                <ul class="list-group">
+                    {% for user in users %}
+                        <li class="list-group-item">
+                            <a href="{% url 'accounts.profile' user.id %}">{{ user.username }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No users found for the current criteria.</p>
+            {% endif %}
         </div>
-        <div class="row mt-2">
-            <div class="col text-end">
-                <button class="btn btn-primary px-4" type="submit">Search</button>
-            </div>
+
+        <div class="col-md-3">
+            {% if user.is_authenticated %}
+                <h4>Saved Searches</h4>
+
+                {% if request.GET %} {# Only show if a search has been performed #}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Save Current Search</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-2">
+                                <input type="text" name="filter_name" class="form-control form-control-sm" placeholder="Name this search..." required>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm w-100">Save</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if saved_filters %}
+                    <ul class="list-group">
+                        {% for filter in saved_filters %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="?{{ filter.filters|urlencode }}">{{ filter.name }}</a>
+                                
+                                <form method="post" action="{% url 'delete_filter' filter.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: aliceblue;">You have no saved searches.</p>
+                {% endif %}
+            {% endif %}
         </div>
-        </div>
-    </form>
-    <script>
+    </div>
+</div>
+
+<script>
     function toggleRoleFields() {
         var role = document.getElementById('user_type').value;
         var seekerFields = document.querySelectorAll('.seeker-field');
@@ -69,17 +131,6 @@
         }
     }
     document.addEventListener('DOMContentLoaded', toggleRoleFields);
-    </script>
-    {% if users %}
-        <ul class="list-group">
-            {% for user in users %}
-                <li class="list-group-item">
-                    <a href="{% url 'accounts.profile' user.id %}">{{ user.username }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No users found.</p>
-    {% endif %}
-</div>
+</script>
+
 {% endblock %}

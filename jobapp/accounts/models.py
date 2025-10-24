@@ -23,3 +23,11 @@ class SeekerProfile(models.Model):
     work_experience = models.CharField(max_length=200, default="")
     links = models.CharField(max_length=300, default="")
     email = models.CharField(max_length=300, default="")
+    
+class SavedFilter(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    filters = models.JSONField()
+
+    def __str__(self):
+        return f'{self.user.username} - {self.name}'
