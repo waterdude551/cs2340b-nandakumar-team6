@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Start New Conversation | JobBoard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Start a New Conversation</h1>
+    
+    {% if available_seekers %}
+        <form method="post" action="{% url 'chat.create_convo' %}">
+            {% csrf_token %}
+            
+            <label for="seeker_id">Select a seeker:</label>
+            <select name="seeker_id" id="seeker_id" required>
+                <option value="">Choose a seeker...</option>
+                {% for seeker in available_seekers %}
+                    <option value="{{ seeker.id }}">{{ seeker.username }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="message">First message:</label>
+            <textarea name="message" id="message" placeholder="Type your first message..." required rows="5"></textarea>
+            
+            <button type="submit">Start Conversation</button>
+        </form>
+    {% else %}
+        <p>No available seekers to message. You've already started conversations with all seekers.</p>
+    {% endif %}
+    
+    <a href="{% url 'chat.list_convos' %}">Back to Conversations</a>
+</div>
+{% endblock %}

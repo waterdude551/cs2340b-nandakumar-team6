@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Messages | JobBoard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Conversation with {{ other_person.username }}</h1>
+    
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
+                <strong>{{ message.sender.username }}:</strong>
+                <p>{{ message.text }}</p>
+                <small>{{ message.sent_at|date:"M d, Y g:i A" }}</small>
+            </div>
+        {% empty %}
+            <p>No messages yet. Start the conversation!</p>
+        {% endfor %}
+    </div>
+    
+    <form method="post" class="message-form">
+        {% csrf_token %}
+        <textarea name="message" placeholder="Type your message..." required></textarea>
+        <button type="submit">Send</button>
+    </form>
+</div>
+{% endblock %}

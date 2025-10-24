@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Messages | JobBoard{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Your Conversations</h1>
+    
+    {% if conversations %}
+        <div class="conversation-list">
+            {% for convo in conversations %}
+                <div class="conversation-item">
+                    <a href="{% url 'chat.show_convo' convo.id %}">
+                        {% if user == convo.recruiter %}
+                            <strong>{{ convo.seeker.username }}</strong>
+                        {% else %}
+                            <strong>{{ convo.recruiter.username }}</strong>
+                        {% endif %}
+                        
+                        {% if convo.messages.last %}
+                            <p>{{ convo.messages.last.text|truncatewords:10 }}</p>
+                            <small>{{ convo.messages.last.sent_at|timesince }} ago</small>
+                        {% endif %}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No conversations yet.</p>
+    {% endif %}
+    {% if user.is_authenticated and user.role == 'recruiter' %}
+        <a href="{% url 'chat.start_convo' %}" class="btn">Start New Conversation</a>
+    {% endif %}
+</div>
+{% endblock %}
