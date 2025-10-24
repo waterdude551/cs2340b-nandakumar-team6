@@ -21,17 +21,18 @@
                 <div class="collapse navbar-collapse justify-content-end">
                     <ul class="navbar-nav gap-3">
                         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.browsing' %}">Job Listings</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts.search' %}">View People</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.browsing' %}">Jobs</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts.search' %}">People</a></li>
                         {% if user.is_authenticated %}
                            <li class="nav-item"><a class="nav-link" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a></li>
                            <li class="nav-item"><a class="nav-link" href="{% url 'accounts.profile' user.id %}">Your Profile</a></li>
+                           <li class="nav-item"><a class="nav-link" href="{% url 'chat.list_convos' %}">Your Chats</a></li>
                         {% else %}
                             <li class="nav-item"><a class="nav-link" href="{% url 'accounts.login' %}">Log In</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'accounts.signup' %}">Register</a></li>
                         {% endif %}
                         {% if user.role == 'recruiter' %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.addpost' %}">Post Job</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.addpost' %}">Post</a></li>
                         {% endif %}
                         {% if user.role == 'seeker' %}
                         <!-- first is status tracker for seekers, second is map -->
