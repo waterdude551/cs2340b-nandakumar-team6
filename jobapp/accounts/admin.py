@@ -7,6 +7,7 @@ from .forms import UserCreationForm, UserChangeForm
 from .models import User, SeekerProfile
 
 admin.site.register(User)
+admin.site.register(SeekerProfile)
 
 class UserAdmin(UserAdmin):
     add_form = UserCreationForm

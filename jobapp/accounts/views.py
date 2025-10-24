@@ -43,7 +43,12 @@ def signup(request):
     elif request.method == 'POST':
         form = CustomUserCreationForm(request.POST, error_class=CustomErrorList)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            
+            # Create SeekerProfile if user is a seeker
+            if user.role == 'seeker':
+                SeekerProfile.objects.create(user=user)
+            
             return redirect('accounts.login')
         else:
             template_data['form'] = form
