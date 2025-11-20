@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .info-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2>Applicant Distribution Map</h2>
+    <div class="info-box">
+        <p class="mb-0">This map displays the location of candidates who have applied to your job postings. 
+           Use the clusters to see regions with high applicant density.</p>
+    </div>
+    <div id="map"></div>
+</div>
+
+<script id="applicants-data" type="application/json">
+    {{ applicants_json|safe }}
+</script>
+
+<script>
+    const applicants = JSON.parse(document.getElementById('applicants-data').textContent);
+
+    // Initialize map
+    const map = L.map('map').setView([39.8283, -98.5795], 4);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Create a marker cluster group
+    const markers = L.markerClusterGroup();
+
+    applicants.forEach(applicant => {
+        // Build popup content
+        let jobListHtml = '<ul style="padding-left: 15px; margin-bottom: 0;">';
+        applicant.applied_jobs.forEach(job => {
+            jobListHtml += `<li><strong>${job.title}</strong>: ${job.stage}</li>`;
+        });
+        jobListHtml += '</ul>';
+
+        const popupContent = `
+            <div style="min-width: 200px">
+                <h5>${applicant.name}</h5>
+                <p class="text-muted mb-2"><small>${applicant.location}</small></p>
+                <hr class="my-2">
+                <strong>Applied to:</strong>
+                ${jobListHtml}
+            </div>
+        `;
+
+        const marker = L.marker([applicant.lat, applicant.lon])
+            .bindPopup(popupContent);
+        
+        markers.addLayer(marker);
+    });
+
+    // Add the cluster group to the map
+    map.addLayer(markers);
+
+    // If we have markers, fit bounds to show them all
+    if (applicants.length > 0) {
+        map.fitBounds(markers.getBounds(), {padding: [50, 50]});
+    }
+</script>
+
+{% endblock %}

@@ -33,6 +33,7 @@
                         {% endif %}
                         {% if user.role == 'recruiter' %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'jobposting.addpost' %}">Post</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'map.applicants' %}">Applicant Map</a></li>
                         {% endif %}
                         {% if user.role == 'seeker' %}
                         <!-- first is status tracker for seekers, second is map -->
