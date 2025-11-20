@@ -88,7 +88,7 @@ def edit_profile(request, id):
         seeker_profile, created = SeekerProfile.objects.get_or_create(user=user)
         if created or not seeker_profile.visibility_settings:
              seeker_profile.visibility_settings = {
-                'headline': True, 'skills': True, 'education': True,
+                'headline': True, 'location': True, 'skills': True, 'education': True,
                 'work_experience': True, 'links': True
             }
 
@@ -100,12 +100,13 @@ def edit_profile(request, id):
         # Always update seeker fields for seekers
         if seeker_profile:
             seeker_profile.headline = request.POST.get('headline', seeker_profile.headline)
+            seeker_profile.location = request.POST.get('location', seeker_profile.location) # Update location
             seeker_profile.skills = request.POST.get('skills', seeker_profile.skills)
             seeker_profile.education = request.POST.get('education', seeker_profile.education)
             seeker_profile.work_experience = request.POST.get('work_experience', seeker_profile.work_experience)
             seeker_profile.links = request.POST.get('links', seeker_profile.links)
             new_settings = {}
-            toggleable_fields = ['headline', 'skills', 'education', 'work_experience', 'links'] 
+            toggleable_fields = ['headline', 'location', 'skills', 'education', 'work_experience', 'links'] 
             for field_name in toggleable_fields:
                 new_settings[field_name] = f'{field_name}_visible' in request.POST
             seeker_profile.visibility_settings = new_settings
@@ -121,6 +122,7 @@ def edit_profile(request, id):
     if seeker_profile:
         initial.update({
             'headline': seeker_profile.headline,
+            'location': seeker_profile.location,
             'skills': seeker_profile.skills,
             'education': seeker_profile.education,
             'work_experience': seeker_profile.work_experience,

@@ -13,6 +13,12 @@
                 <input type="checkbox" name="headline_visible" {% if initial.visibility_settings.headline %}checked{% endif %}>
             </li>
             <li>
+                <label for="id_location">Location (City, State/Country):</label>
+                <input type="text" name="location" id="id_location" value="{{ initial.location }}">
+                <label>Visible to Recruiters?</label>
+                <input type="checkbox" name="location_visible" {% if initial.visibility_settings.location %}checked{% endif %}>
+            </li>
+            <li>
                 <label for="id_skills">Skills:</label>
                 <input type="text" name="skills" id="id_skills" value="{{ initial.skills }}">
                 <label>Visible to Recruiters?</label>
