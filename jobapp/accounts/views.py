@@ -59,9 +59,20 @@ def signup(request):
 def profile(request, id):
     user = get_object_or_404(User, id=id)
     seeker_profile = None
+    visibility_settings = {}
     if user.role == "seeker":
         seeker_profile = getattr(user, 'seeker_profile', None)
-    return render(request, 'accounts/profile.html', {'profile': user, 'seeker_profile': seeker_profile})
+        if seeker_profile and hasattr(seeker_profile, 'visibility_settings'):
+            visibility_settings = seeker_profile.visibility_settings
+            
+    is_recruiter_viewing = (request.user.is_authenticated and request.user.role == 'recruiter' and user.role == 'seeker')
+
+    return render(request, 'accounts/profile.html', {
+        'profile': user, 
+        'seeker_profile': seeker_profile,
+        'visibility': visibility_settings,
+        'is_recruiter_viewing': is_recruiter_viewing,
+    })
 
 
 @login_required
@@ -75,6 +86,11 @@ def edit_profile(request, id):
     seeker_profile = None
     if user.role == "seeker":
         seeker_profile, created = SeekerProfile.objects.get_or_create(user=user)
+        if created or not seeker_profile.visibility_settings:
+             seeker_profile.visibility_settings = {
+                'headline': True, 'skills': True, 'education': True,
+                'work_experience': True, 'links': True
+            }
 
     if request.method == 'POST':
         user.first_name = request.POST.get('first_name', user.first_name)
@@ -88,6 +104,11 @@ def edit_profile(request, id):
             seeker_profile.education = request.POST.get('education', seeker_profile.education)
             seeker_profile.work_experience = request.POST.get('work_experience', seeker_profile.work_experience)
             seeker_profile.links = request.POST.get('links', seeker_profile.links)
+            new_settings = {}
+            toggleable_fields = ['headline', 'skills', 'education', 'work_experience', 'links'] 
+            for field_name in toggleable_fields:
+                new_settings[field_name] = f'{field_name}_visible' in request.POST
+            seeker_profile.visibility_settings = new_settings
             seeker_profile.save()
         return redirect('accounts.profile', id=user.id)
 
@@ -104,6 +125,7 @@ def edit_profile(request, id):
             'education': seeker_profile.education,
             'work_experience': seeker_profile.work_experience,
             'links': seeker_profile.links,
+            'visibility_settings': seeker_profile.visibility_settings
         })
     return render(request, 'accounts/edit_profile.html', {'user': user, 'initial': initial})
 

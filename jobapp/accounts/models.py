@@ -23,6 +23,8 @@ class SeekerProfile(models.Model):
     work_experience = models.CharField(max_length=200, default="")
     links = models.CharField(max_length=300, default="")
     email = models.CharField(max_length=300, default="")
+
+    visibility_settings = models.JSONField(default=dict)
     
 class SavedFilter(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

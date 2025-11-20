@@ -25,26 +25,40 @@
             <li><strong>Email:</strong> {{ profile.email }}</li>
         {% endif %}
         {% if profile.role == "seeker" and seeker_profile %}
-            {% if seeker_profile.headline %}<li><strong>Headline:</strong> {{ seeker_profile.headline }}</li>{% endif %}
-            {% if seeker_profile.skills %}<li><strong>Skills:</strong> {{ seeker_profile.skills }}</li>{% endif %}
-            {% if seeker_profile.education %}<li><strong>Education:</strong> {{ seeker_profile.education }}</li>{% endif %}
-            {% if seeker_profile.work_experience %}<li><strong>Work Experience:</strong> {{ seeker_profile.work_experience }}</li>{% endif %}
+            
+            {% if seeker_profile.headline %}
+                {% if not is_recruiter_viewing or visibility.headline %}
+                    <li><strong>Headline:</strong> {{ seeker_profile.headline }}</li>
+                {% endif %}
+            {% endif %}
+            
+            {% if seeker_profile.skills %}
+                {% if not is_recruiter_viewing or visibility.skills %}
+                    <li><strong>Skills:</strong> {{ seeker_profile.skills }}</li>
+                {% endif %}
+            {% endif %}
+            
+            {% if seeker_profile.education %}
+                {% if not is_recruiter_viewing or visibility.education %}
+                    <li><strong>Education:</strong> {{ seeker_profile.education }}</li>
+                {% endif %}
+            {% endif %}
+            
+            {% if seeker_profile.work_experience %}
+                {% if not is_recruiter_viewing or visibility.work_experience %}
+                    <li><strong>Work Experience:</strong> {{ seeker_profile.work_experience }}</li>
+                {% endif %}
+            {% endif %}
+            
             {% if seeker_profile.links %}
+                {% if not is_recruiter_viewing or visibility.links %}
                 <li><strong>Links:</strong>
                     <ul>
                     {% for link in seeker_profile.links|split:"," %}
-                        {% with link=link|trim %}
-                            {% if link %}
-                                {% if link|slice:":7" == "http://" or link|slice:":8" == "https://" %}
-                                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
-                                {% else %}
-                                    <li><a href="https://{{ link }}" target="_blank">{{ link }}</a></li>
-                                {% endif %}
-                            {% endif %}
-                        {% endwith %}
-                    {% endfor %}
+                        {% endfor %}
                     </ul>
                 </li>
+                {% endif %}
             {% endif %}
         {% endif %}
         <!-- Add recruiter-specific fields here if needed -->

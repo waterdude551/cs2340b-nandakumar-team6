@@ -4,39 +4,37 @@
 <h1>Edit Your Profile</h1>
 <form method="post">
     {% csrf_token %}
-    <ul>
-        <li>
-            <label for="id_first_name">First name:</label>
-            <input type="text" name="first_name" id="id_first_name" value="{{ initial.first_name }}">
-        </li>
-        <li>
-            <label for="id_last_name">Last name:</label>
-            <input type="text" name="last_name" id="id_last_name" value="{{ initial.last_name }}">
-        </li>
-        <li>
-            <label for="id_email">Email:</label>
-            <input type="email" name="email" id="id_email" value="{{ initial.email }}">
-        </li>
+   <ul>
         {% if user.role == "seeker" %}
             <li>
                 <label for="id_headline">Headline:</label>
                 <input type="text" name="headline" id="id_headline" value="{{ initial.headline }}">
+                <label>Visible to Recruiters?</label>
+                <input type="checkbox" name="headline_visible" {% if initial.visibility_settings.headline %}checked{% endif %}>
             </li>
             <li>
                 <label for="id_skills">Skills:</label>
                 <input type="text" name="skills" id="id_skills" value="{{ initial.skills }}">
+                <label>Visible to Recruiters?</label>
+                <input type="checkbox" name="skills_visible" {% if initial.visibility_settings.skills %}checked{% endif %}>
             </li>
             <li>
                 <label for="id_education">Education:</label>
                 <input type="text" name="education" id="id_education" value="{{ initial.education }}">
+                <label>Visible to Recruiters?</label>
+                <input type="checkbox" name="education_visible" {% if initial.visibility_settings.education %}checked{% endif %}>
             </li>
             <li>
                 <label for="id_work_experience">Work Experience:</label>
                 <input type="text" name="work_experience" id="id_work_experience" value="{{ initial.work_experience }}">
+                <label>Visible to Recruiters?</label>
+                <input type="checkbox" name="work_experience_visible" {% if initial.visibility_settings.work_experience %}checked{% endif %}>
             </li>
             <li>
                 <label for="id_links">Links:</label>
                 <input type="text" name="links" id="id_links" value="{{ initial.links }}">
+                <label>Visible to Recruiters?</label>
+                <input type="checkbox" name="links_visible" {% if initial.visibility_settings.links %}checked{% endif %}>
             </li>
         {% endif %}
     </ul>
