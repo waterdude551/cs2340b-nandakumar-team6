@@ -1,4 +1,5 @@
 
+import sys
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
@@ -7,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .forms import CustomUserCreationForm, CustomErrorList, EmailSeekerForm
 from .models import User, SeekerProfile, SavedFilter
+from jobposting.models import JobPost
 from django.core.mail import send_mail
 from django.contrib import messages
 
@@ -198,7 +200,40 @@ def search_users(request):
         'saved_filters': saved_filters,
     }
 
-    return render(request, 'accounts/search.html', context)
+    #if user isn't recruiter or is searching for recruiters, render normally
+    if not request.user.is_authenticated or not request.user.role == "recruiter" or user_type == "recruiter":
+        return render(request, 'accounts/search.html', context)
+    
+    recruiter = request.user
+    skillsWanted = set()
+    for job in JobPost.objects.filter(recruiter=recruiter):
+        jobSkillList = job.skills.strip().lower().split(", ")
+        for skill in jobSkillList:
+            skillsWanted.add(skill)
+            # print(f"added {skill} to skills wanted", file=sys.stderr) # this is how u console log btw
+    
+    if not skillsWanted:
+        return render(request, 'accounts/search.html', context)
+
+    sortedSeekers = []
+    wantedSkillList = [skill.strip().lower() for skill in skillsWanted]
+
+    for seeker in users.filter(role="seeker"):
+        seekerProf = seeker.seeker_profile
+        if seekerProf.skills:
+            seekerSkillList = [skill.strip().lower() for skill in seekerProf.skills.split(",")]
+            matchedSkills = sum(skill in wantedSkillList for skill in seekerSkillList)
+           #  print(f"{seeker.username} has {matchedSkills} matched skills: {seekerSkillList}", file=sys.stderr)
+            if matchedSkills > 0:
+                sortedSeekers.append((matchedSkills, seeker))
+
+    sortedSeekers = sorted(sortedSeekers, key=lambda x: x[0], reverse=True)
+    sortedSeekers = [seeker for _, seeker in sortedSeekers]
+    users = sortedSeekers[3:]
+    topSeekers = sortedSeekers[:3]
+    
+    return render(request, 'accounts/search.html', { **context, 'topSeekers': topSeekers})
+
 
 def email_seeker(request, id):
     recruiter = request.user

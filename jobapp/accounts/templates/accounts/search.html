@@ -64,6 +64,21 @@
             <hr>
 
             <h3>Results</h3>
+            
+            {% if topSeekers %}
+            
+                <h4 class="text-light mb-3">Top Matched Candidates</h2>
+                <ul class="list-group mb-5">
+                    {% for user in topSeekers %}
+                        <div { border-width: thick; }>
+                            <li class="list-group-item border-success">
+                                <a href="{% url 'accounts.profile' user.id %}">{{ user.username }}</a>
+                            </li>
+                        </div>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             {% if users %}
                 <ul class="list-group">
                     {% for user in users %}
