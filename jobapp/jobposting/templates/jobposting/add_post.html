@@ -1,12 +1,59 @@
-<!-- FORMERLY addpost.html -->
 {% extends "base.html" %}
 {% block title %}Create Job Post | JobBoard{% endblock %}
 {% block content %}
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <h1>Add Job Post</h1>
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Submit</button>
+    {{ form.non_field_errors }}
+    
+    <div class="row">
+        <div class="col-md-6">
+            {{ form.as_p }}
+        </div>
+        <div class="col-md-6">
+            <label>Pin Office Location (Click on map):</label>
+            <div id="map" style="height: 400px; width: 100%; border-radius: 5px; border: 1px solid #ccc;"></div>
+            <p class="text-muted small mt-1">Clicking the map will set the exact coordinates for this job.</p>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Submit</button>
 </form>
+
+<script>
+    const map = L.map('map').setView([39.8283, -98.5795], 4);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let marker = null;
+    const latInput = document.getElementById('id_latitude');
+    const lngInput = document.getElementById('id_longitude');
+
+    // Handle click to drop pin
+    map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+
+        latInput.value = lat;
+        lngInput.value = lng;
+    });
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            map.setView([position.coords.latitude, position.coords.longitude], 10);
+        });
+    }
+</script>
 {% endblock %}

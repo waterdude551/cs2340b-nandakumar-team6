@@ -1,54 +1,81 @@
-
-<!-- FORMERLY browsepost.html -->
 {% extends "base.html" %}
 {% block title %} {{ jobpost.title }} | JobBoard{% endblock %}
 {% block content %}
-<head>
-    <title>List Job Posting</title>
-</head>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <div class="container mt-4">
     <h1>{{ jobpost.title }}</h1>
-    <p class="text-light"><strong>Location:</strong> {{ jobpost.location }}</p>
-    <p class="text-light"><strong>Skills:</strong> {{ jobpost.skills }}</p>
-    <p class="text-light"><strong>Salary:</strong> {{ jobpost.salary }}</p>
-    <p class="text-light"><strong>Remote/On-site:</strong> {{ jobpost.get_remote_type_display }}</p>
-    <p class="text-light"><strong>Visa Sponsorship:</strong> {{ jobpost.visa_sponsorship|yesno:"Yes,No" }}</p>
-    <p class="text-light"><strong>Description:</strong> {{ jobpost.description }}</p>
-    <p class="text-light"><strong>Qualifications:</strong> {{ jobpost.qualifications }}</p>
-
-    {% if can_edit %}
-        <a href="{% url 'jobposting.edit_post' jobpost.id %}" class="btn btn-warning">Edit Post</a>
-        <a href="{% url 'jobposting.list_applications' jobpost.id %}" class="btn btn-info">View Applications</a>
-    {% endif %}
-    {% if user.is_authenticated and user.role == "seeker" %}
-        <!-- Apply Button -->
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#applyModal">
-            Apply
-        </button>
-    {% endif %}
-</div>
-    {% if user.is_authenticated and user.role == "seeker" %}
-    <!-- Modal -->
-    <div class="modal fade text-dark" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form method="post" action="{% url 'jobposting.apply' jobpost.id %}">
-                    {% csrf_token %}
-                    <div class="modal-header">
-                        <h5 class="modal-title text-dark" id="applyModalLabel">Apply for {{ jobpost.title }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        {{ form.as_p }}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </form>
-            </div>
+    
+    <div class="row">
+        <div class="col-md-7">
+            <p class="text-light"><strong>Location:</strong> {{ jobpost.location }}</p>
+            <p class="text-light"><strong>Skills:</strong> {{ jobpost.skills }}</p>
+            <p class="text-light"><strong>Salary:</strong> {{ jobpost.salary }}</p>
+            <p class="text-light"><strong>Remote/On-site:</strong> {{ jobpost.get_remote_type_display }}</p>
+            <p class="text-light"><strong>Visa Sponsorship:</strong> {{ jobpost.visa_sponsorship|yesno:"Yes,No" }}</p>
+            <p class="text-light"><strong>Description:</strong> {{ jobpost.description }}</p>
+            <p class="text-light"><strong>Qualifications:</strong> {{ jobpost.qualifications }}</p>
+        </div>
+        <div class="col-md-5">
+            {% if jobpost.latitude and jobpost.longitude %}
+                <div id="map" style="height: 300px; width: 100%; border-radius: 8px;"></div>
+             {% endif %}
         </div>
     </div>
-    {% endif %}
+
+    <div class="mt-3">
+        {% if can_edit %}
+            <a href="{% url 'jobposting.edit_post' jobpost.id %}" class="btn btn-warning">Edit Post</a>
+            <a href="{% url 'jobposting.list_applications' jobpost.id %}" class="btn btn-info">View Applications</a>
+        {% endif %}
+        
+        {% if user.is_authenticated and user.role == "seeker" %}
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#applyModal">
+                Apply
+            </button>
+        {% endif %}
+    </div>
+</div>
+
+{% if user.is_authenticated and user.role == "seeker" %}
+<div class="modal fade text-dark" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'jobposting.apply' jobpost.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title text-dark" id="applyModalLabel">Apply for {{ jobpost.title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if jobpost.latitude and jobpost.longitude %}
+<script>
+    
+    const lat = parseFloat("{{ jobpost.latitude|stringformat:'f' }}");
+    const lng = parseFloat("{{ jobpost.longitude|stringformat:'f' }}");
+    
+    const map = L.map('map').setView([lat, lng], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+    
+    L.marker([lat, lng]).addTo(map)
+        .bindPopup("<b>{{ jobpost.title|escapejs }}</b><br>{{ jobpost.location|escapejs }}");
+</script>
+{% endif %}
+
 {% endblock %}

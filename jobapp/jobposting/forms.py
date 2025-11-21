@@ -7,7 +7,7 @@ class JobPostForm(forms.ModelForm):
         model = JobPost
         fields = [
             'title', 'skills', 'remote_type', 'city', 'state', 'country',
-            'salary', 'visa_sponsorship', 'description', 'qualifications'
+            'latitude', 'longitude', 'salary', 'visa_sponsorship', 'description', 'qualifications'
         ]
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Enter job title', 'class': 'form-control'}),
@@ -20,14 +20,17 @@ class JobPostForm(forms.ModelForm):
             'visa_sponsorship': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'description': forms.Textarea(attrs={'placeholder': 'Enter job description', 'class': 'form-control', 'rows': 4}),
             'qualifications': forms.Textarea(attrs={'placeholder': 'Enter qualifications', 'class': 'form-control', 'rows': 3}),
+            'latitude': forms.HiddenInput(),
+            'longitude': forms.HiddenInput(),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make location fields not required by default
         self.fields['city'].required = False
         self.fields['state'].required = False
         self.fields['country'].required = False
+        self.fields['latitude'].required = False
+        self.fields['longitude'].required = False
     
     def clean(self):
         cleaned_data = super().clean()
@@ -35,7 +38,6 @@ class JobPostForm(forms.ModelForm):
         city = cleaned_data.get('city')
         country = cleaned_data.get('country')
         
-        # Require location for on-site and hybrid jobs
         if remote_type in ['on-site', 'hybrid']:
             if not city:
                 self.add_error('city', 'City is required for on-site and hybrid positions')
