@@ -5,6 +5,18 @@
 <form method="post">
     {% csrf_token %}
    <ul>
+       <li>
+            <label for="id_first_name">First name:</label>
+            <input type="text" name="first_name" id="id_first_name" value="{{ initial.first_name }}">
+        </li>
+        <li>
+            <label for="id_last_name">Last name:</label>
+            <input type="text" name="last_name" id="id_last_name" value="{{ initial.last_name }}">
+        </li>
+        <li>
+            <label for="id_email">Email:</label>
+            <input type="email" name="email" id="id_email" value="{{ initial.email }}">
+        </li>
         {% if user.role == "seeker" %}
             <li>
                 <label for="id_headline">Headline:</label>

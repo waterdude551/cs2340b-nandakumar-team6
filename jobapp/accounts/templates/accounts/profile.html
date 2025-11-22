@@ -25,52 +25,47 @@
             <li><strong>Email:</strong> {{ profile.email }}</li>
         {% endif %}
         {% if profile.role == "seeker" and seeker_profile %}
-            
             {% if seeker_profile.headline %}
                 {% if not is_recruiter_viewing or visibility.headline %}
                     <li><strong>Headline:</strong> {{ seeker_profile.headline }}</li>
                 {% endif %}
             {% endif %}
-            
             {% if seeker_profile.skills %}
                 {% if not is_recruiter_viewing or visibility.skills %}
                     <li><strong>Skills:</strong> {{ seeker_profile.skills }}</li>
                 {% endif %}
             {% endif %}
-            
             {% if seeker_profile.education %}
                 {% if not is_recruiter_viewing or visibility.education %}
                     <li><strong>Education:</strong> {{ seeker_profile.education }}</li>
                 {% endif %}
             {% endif %}
-            
             {% if seeker_profile.work_experience %}
                 {% if not is_recruiter_viewing or visibility.work_experience %}
                     <li><strong>Work Experience:</strong> {{ seeker_profile.work_experience }}</li>
                 {% endif %}
             {% endif %}
-            
             {% if seeker_profile.links %}
                 {% if not is_recruiter_viewing or visibility.links %}
                 <li><strong>Links:</strong>
                     <ul>
                     {% for link in seeker_profile.links|split:"," %}
-                        {% endfor %}
+                        <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                    {% endfor %}
                     </ul>
                 </li>
                 {% endif %}
             {% endif %}
         {% endif %}
-        <!-- Add recruiter-specific fields here if needed -->
+        <!-- Recruiter-specific fields would go here if they had any beyond name/email -->
+        
         {% if user.is_authenticated and user.role == "recruiter" and profile.role == "seeker" and profile.email and user.email %}
             <a href="{% url 'accounts.email_seeker' profile.id %}" class="btn btn-primary">Email Seeker</a>
-        
         {% elif user.is_authenticated and user.role == "recruiter" and profile.role == "seeker" and profile.email %}
                 <text class="text-light">Add your contact information to email this potential candidate!</text>
         {% endif %}
     </ul>
-
-    {% if user.is_authenticated and user.id == profile.id %}    
+    {% if user.is_authenticated and user.id == profile.id %}
     <div class="mt-3">
             {% if user.role == "seeker" %}
                 <a href="{% url 'jobposting.seeker_applications' %}" class="btn btn-info me-2">View Your Applications</a>
